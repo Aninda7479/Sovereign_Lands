@@ -64,7 +64,14 @@ function runAgentGit() {
   acquireLock();
 
   try {
-    // 1. Stage specified files (or status file if nothing else passed)
+    // 1. First, pull latest remote changes so we are on the newest HEAD
+    try {
+      execSync('git pull --rebase origin main', { cwd: ROOT_DIR, stdio: 'pipe' });
+    } catch (pullErr) {
+      // Non-fatal if offline or detached HEAD
+    }
+
+    // 2. Stage specified files
     if (specificFiles.length > 0) {
       for (const file of specificFiles) {
         if (fs.existsSync(path.resolve(ROOT_DIR, file))) {
@@ -73,38 +80,43 @@ function runAgentGit() {
       }
     }
 
-    // Always stage the agent's status file
+    // Always stage the agent's status file if it exists
     const statusFile = path.join('status', `${agentId}.json`);
     if (fs.existsSync(path.resolve(ROOT_DIR, statusFile))) {
       execSync(`git add "${statusFile}"`, { cwd: ROOT_DIR, stdio: 'inherit' });
     }
 
-    // 2. Check if anything is actually staged
-    const statusOutput = execSync('git status --porcelain', { cwd: ROOT_DIR }).toString().trim();
-    if (!statusOutput) {
-      console.log(`ℹ️ [${agentId.toUpperCase()}] No staged changes to commit.`);
+    // 3. Check if anything is staged for commit
+    let hasStagedChanges = false;
+    try {
+      execSync('git diff --cached --quiet', { cwd: ROOT_DIR });
+      hasStagedChanges = false;
+    } catch (diffErr) {
+      // Exit code 1 means differences exist!
+      hasStagedChanges = true;
+    }
+
+    if (!hasStagedChanges) {
+      console.log(`ℹ️ [${agentId.toUpperCase()}] No staged file changes detected to commit.`);
       return;
     }
 
-    // 3. Commit
+    // 4. Commit
     console.log(`💾 [${agentId.toUpperCase()}] Committing: "${commitMessage}"...`);
     execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`, { cwd: ROOT_DIR, stdio: 'inherit' });
 
-    // 4. Pull with rebase to incorporate work from other parallel agents
-    console.log(`🔄 [${agentId.toUpperCase()}] Syncing latest commits from remote...`);
+    // 5. Re-check remote before pushing to ensure fast-forward
     try {
-      execSync('git pull --rebase origin main', { cwd: ROOT_DIR, stdio: 'inherit' });
-    } catch (pullErr) {
-      console.warn(`⚠️ [${agentId.toUpperCase()}] Pull rebase warning (continuing push):`, pullErr.message);
-    }
+      execSync('git pull --rebase origin main', { cwd: ROOT_DIR, stdio: 'pipe' });
+    } catch (rebaseErr) {}
 
-    // 5. Push online
+    // 6. Push online
     console.log(`🚀 [${agentId.toUpperCase()}] Publishing commit online to GitHub...`);
     try {
       execSync('git push origin main', { cwd: ROOT_DIR, stdio: 'inherit' });
       console.log(`✅ [${agentId.toUpperCase()}] Successfully published to remote repository!`);
     } catch (pushErr) {
-      console.warn(`⚠️ [${agentId.toUpperCase()}] Push failed (changes committed locally, will push next cycle):`, pushErr.message);
+      console.warn(`⚠️ [${agentId.toUpperCase()}] Push rejected or offline. Will retry next push cycle.`, pushErr.message);
     }
 
   } catch (error) {
