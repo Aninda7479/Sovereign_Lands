@@ -1,9 +1,10 @@
 {
   "agentId": "agent-09",
   "name": "3D Roaming NPC Engine & Dialogue HUD",
-  "status": "UNDER_CONSTRUCTION",
+  "status": "READY",
   "startedAt": "2026-10-31T07:20:00Z",
-  "progress": "Acquired lock. Building 3D waypoint navigation, proximity trigger, and GTA dialogue interface...",
+  "completedAt": "2026-10-31T07:26:00Z",
+  "progress": "All deliverables complete: NPCProfiles for Aldric, Sir Gareth, Merin, and Zara; NPCRoamingController with waypoint navigation and terrain height snapping; NPCManager with proximity tracking and BYOAI dialogue coordination; FloatingSpeechBubble 3D billboard; NPCWorldEntity with articulated limb animations and 5m interaction sphere; and DialogueHUD GTA conversation overlay with typewriter audio streaming.",
   "exclusiveFiles": [
     "ai-system/npc-engine/NPCManager.ts",
     "ai-system/npc-engine/NPCRoamingController.ts",
