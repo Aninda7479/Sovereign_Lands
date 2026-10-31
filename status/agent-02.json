@@ -1,5 +1,16 @@
 {
   "agentId": "agent-02",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.311Z"
+  "name": "Contract Testing & Deploy",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T06:28:00Z",
+  "progress": "Configuring foundry.toml and writing 3D parcel test suite...",
+  "exclusiveFiles": [
+    "contracts/foundry.toml",
+    "contracts/test/SovereignLands.t.sol",
+    "contracts/test/SpatialQuery.t.sol",
+    "contracts/script/Deploy.s.sol",
+    "contracts/script/SeedWorldParcels.s.sol",
+    "contracts/Makefile",
+    "contracts/.env.example"
+  ]
 }
