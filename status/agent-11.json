@@ -1,5 +1,14 @@
 {
   "agentId": "agent-11",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.314Z"
+  "name": "3D Kingdom Lore & World Bible",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T07:30:00Z",
+  "progress": "Writing open-world lore, runestone inscriptions, and kingdom histories...",
+  "exclusiveFiles": [
+    "docs/lore/realm-history.md",
+    "docs/lore/factions-and-heraldry.md",
+    "docs/lore/monument-inscriptions.md",
+    "docs/lore/npc-character-dialogue.md",
+    "docs/lore/in-game-lexicon.md"
+  ]
 }
