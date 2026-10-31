@@ -1,0 +1,126 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "SovereignLands-GLTF-Builder"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Fountain",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Fountain_node",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Fountain_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Fountain_mat",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.2196078431372549,
+          0.7411764705882353,
+          0.9725490196078431,
+          1
+        ],
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.8
+      }
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "max": [
+        3,
+        1.9,
+        3
+      ],
+      "min": [
+        -3,
+        -1.9,
+        -3
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR",
+      "max": [
+        23
+      ],
+      "min": [
+        0
+      ]
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 72,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 648,
+      "uri": "data:application/octet-stream;base64,AABAwDMz878AAEBAAABAQDMz878AAEBAAABAQDMz8z8AAEBAAABAwDMz8z8AAEBAAABAwDMz878AAEDAAABAwDMz8z8AAEDAAABAQDMz8z8AAEDAAABAQDMz878AAEDAAABAwDMz8z8AAEDAAABAwDMz8z8AAEBAAABAQDMz8z8AAEBAAABAQDMz8z8AAEDAAABAwDMz878AAEDAAABAQDMz878AAEDAAABAQDMz878AAEBAAABAwDMz878AAEBAAABAQDMz878AAEDAAABAQDMz8z8AAEDAAABAQDMz8z8AAEBAAABAQDMz878AAEBAAABAwDMz878AAEDAAABAwDMz878AAEBAAABAwDMz8z8AAEBAAABAwDMz8z8AAEDAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcA"
+    }
+  ]
+}

@@ -32,7 +32,7 @@ export function StructureManager({
     windmillRotors.current = [];
 
     return parcels
-      .filter((p) => p.structure > 0 && p.structure <= 4)
+      .filter((p) => p.structure > 0 && p.structure <= 10)
       .map((p) => {
         const { centerX, centerZ, centerY } = calculateParcelCenter(p.bounds);
         const faction: Faction = p.kingdom === 'North' ? 'north' : 'south';

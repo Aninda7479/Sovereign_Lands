@@ -94,6 +94,7 @@ export interface MainSceneProps {
   buildPosition?: [number, number, number];
   isBuildValid?: boolean;
   playerFaction?: 'north' | 'south' | 'neutral';
+  isPointerLockDisabled?: boolean;
 }
 
 /**
@@ -123,6 +124,7 @@ export function MainScene({
   buildPosition: propBuildPosition,
   isBuildValid = true,
   playerFaction = 'north',
+  isPointerLockDisabled = false,
 }: MainSceneProps) {
   // Attempt to read GameProvider context (gracefully fallback if rendered standalone)
   let gameState: Partial<GameStateContextType> = {};
@@ -248,6 +250,7 @@ export function MainScene({
         <PlayerController
           initialPosition={initialPlayerPosition}
           faction={playerFaction}
+          isPointerLockDisabled={isPointerLockDisabled}
           onPositionChange={handlePositionChange}
           onParcelAction={handleParcelAction}
         />

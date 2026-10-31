@@ -21,7 +21,7 @@ export interface StructureBuildCost {
 export const STRUCTURE_BUILD_INFO: Record<number, StructureBuildCost> = {
   [StructureTypeEnum.Farmstead]: {
     type: StructureTypeEnum.Farmstead,
-    name: 'Farmstead',
+    name: 'Farmstead & Mill',
     goldCost: 50,
     width: 16.0,
     depth: 16.0,
@@ -29,7 +29,7 @@ export const STRUCTURE_BUILD_INFO: Record<number, StructureBuildCost> = {
   },
   [StructureTypeEnum.GuardTower]: {
     type: StructureTypeEnum.GuardTower,
-    name: 'Guard Tower',
+    name: 'Guard Watchtower',
     goldCost: 80,
     width: 5.2,
     depth: 5.2,
@@ -37,7 +37,7 @@ export const STRUCTURE_BUILD_INFO: Record<number, StructureBuildCost> = {
   },
   [StructureTypeEnum.StoneWall]: {
     type: StructureTypeEnum.StoneWall,
-    name: 'Stone Wall',
+    name: 'Curtain Stone Wall',
     goldCost: 60,
     width: 10.0,
     depth: 2.6,
@@ -45,11 +45,59 @@ export const STRUCTURE_BUILD_INFO: Record<number, StructureBuildCost> = {
   },
   [StructureTypeEnum.CastleKeep]: {
     type: StructureTypeEnum.CastleKeep,
-    name: 'Castle Keep',
+    name: 'Castle Keep Fortress',
     goldCost: 150,
     width: 16.0,
     depth: 16.0,
     description: '+10 Attack, +5 Defense citadel fortress',
+  },
+  [StructureTypeEnum.HouseThatched]: {
+    type: StructureTypeEnum.HouseThatched,
+    name: 'Thatched Cottage',
+    goldCost: 35,
+    width: 8.0,
+    depth: 8.0,
+    description: '+2 Population, +2 Gold/min artisan residential cottage',
+  },
+  [StructureTypeEnum.HouseTimber]: {
+    type: StructureTypeEnum.HouseTimber,
+    name: 'Timber Townhouse',
+    goldCost: 65,
+    width: 9.0,
+    depth: 9.0,
+    description: '+5 Population, +4 Gold/min two-story merchant villa',
+  },
+  [StructureTypeEnum.HouseStone]: {
+    type: StructureTypeEnum.HouseStone,
+    name: 'Nordic Stone Manor',
+    goldCost: 95,
+    width: 12.0,
+    depth: 11.0,
+    description: '+10 Population, +3 Defense fortified noble homestead',
+  },
+  [StructureTypeEnum.HouseWizard]: {
+    type: StructureTypeEnum.HouseWizard,
+    name: 'Arcane Wizard Tower',
+    goldCost: 120,
+    width: 8.5,
+    depth: 8.5,
+    description: '+10 Magic Influence, +5 Gold/min alchemical sanctum',
+  },
+  [StructureTypeEnum.HouseCabin]: {
+    type: StructureTypeEnum.HouseCabin,
+    name: 'Alpine Log Cabin',
+    goldCost: 40,
+    width: 7.5,
+    depth: 7.5,
+    description: '+3 Population, +2 Gold/min woodcutter lodge',
+  },
+  [StructureTypeEnum.Fountain]: {
+    type: StructureTypeEnum.Fountain,
+    name: 'Royal Tiered Fountain',
+    goldCost: 75,
+    width: 7.2,
+    depth: 7.2,
+    description: '+8 Civic Morale, +3 Gold/min civic centerpiece',
   },
 };
 

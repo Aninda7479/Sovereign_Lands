@@ -19,6 +19,7 @@ export interface PlayerControllerProps {
   initialPosition?: [number, number, number];
   initialRotation?: number;
   faction?: 'north' | 'south' | 'neutral';
+  isPointerLockDisabled?: boolean;
   onPositionChange?: (position: [number, number, number]) => void;
   onParcelAction?: (action: 'interact' | 'build' | 'buy') => void;
 }
@@ -32,6 +33,7 @@ export function PlayerController({
   initialPosition = [0, 2.0, 0],
   initialRotation = 0,
   faction = 'north',
+  isPointerLockDisabled = false,
   onPositionChange,
   onParcelAction,
 }: PlayerControllerProps) {
@@ -141,6 +143,7 @@ export function PlayerController({
       <ThirdPersonCamera
         targetPosition={playerPosition}
         isSprinting={controls.sprint}
+        isPointerLockDisabled={isPointerLockDisabled}
         onCameraYawChange={(yaw) => {
           cameraYawRef.current = yaw;
         }}

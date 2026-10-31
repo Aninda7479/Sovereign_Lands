@@ -11,6 +11,7 @@ export interface ThirdPersonCameraProps {
   minDistance?: number;
   maxDistance?: number;
   sensitivity?: number;
+  isPointerLockDisabled?: boolean;
   onCameraYawChange?: (yaw: number) => void;
 }
 
@@ -26,6 +27,7 @@ export function ThirdPersonCamera({
   minDistance = 1.6,
   maxDistance = 10.0,
   sensitivity = 0.0022,
+  isPointerLockDisabled = false,
   onCameraYawChange,
 }: ThirdPersonCameraProps) {
   const { camera, gl, scene } = useThree();
@@ -35,18 +37,34 @@ export function ThirdPersonCamera({
   const distance = useRef(defaultDistance);
   const isPointerLocked = useRef(false);
   const isMouseDown = useRef(false);
+  const previousMousePosition = useRef({ x: 0, y: 0 });
 
   const currentCamPos = useRef(new THREE.Vector3(0, 5, 10));
   const currentLookAt = useRef(new THREE.Vector3(0, 1.4, 0));
   const raycaster = useRef(new THREE.Raycaster());
+
+  // Release pointer lock immediately if pointer lock is disabled (e.g. pause/settings menu open)
+  useEffect(() => {
+    if (isPointerLockDisabled) {
+      if (typeof document !== 'undefined' && document.pointerLockElement) {
+        document.exitPointerLock?.();
+      }
+      isPointerLocked.current = false;
+      isMouseDown.current = false;
+    }
+  }, [isPointerLockDisabled]);
 
   // Mouse Orbit Listeners & Pointer Lock
   useEffect(() => {
     const canvas = gl.domElement;
 
     const handleMouseDown = (e: MouseEvent) => {
+      // If pointer lock is disabled (menu open), don't lock pointer
+      if (isPointerLockDisabled) return;
+
       if (e.button === 0 || e.button === 2) {
         isMouseDown.current = true;
+        previousMousePosition.current = { x: e.clientX, y: e.clientY };
       }
       // Request pointer lock on click if not already locked
       if (!document.pointerLockElement) {
@@ -63,7 +81,9 @@ export function ThirdPersonCamera({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (isPointerLocked.current || isMouseDown.current) {
+      if (isPointerLockDisabled) return;
+
+      if (isPointerLocked.current) {
         yaw.current -= e.movementX * sensitivity;
         pitch.current -= e.movementY * sensitivity;
 
@@ -71,10 +91,22 @@ export function ThirdPersonCamera({
         pitch.current = Math.max(-0.25, Math.min(1.2, pitch.current));
 
         onCameraYawChange?.(yaw.current);
+      } else if (isMouseDown.current) {
+        // Drag without pointer lock fallback
+        const deltaX = e.clientX - previousMousePosition.current.x;
+        const deltaY = e.clientY - previousMousePosition.current.y;
+        previousMousePosition.current = { x: e.clientX, y: e.clientY };
+
+        yaw.current -= deltaX * sensitivity;
+        pitch.current -= deltaY * sensitivity;
+        pitch.current = Math.max(-0.25, Math.min(1.2, pitch.current));
+
+        onCameraYawChange?.(yaw.current);
       }
     };
 
     const handleWheel = (e: WheelEvent) => {
+      if (isPointerLockDisabled) return;
       distance.current += e.deltaY * 0.005;
       distance.current = Math.max(minDistance, Math.min(maxDistance, distance.current));
     };
@@ -92,7 +124,7 @@ export function ThirdPersonCamera({
       window.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('wheel', handleWheel);
     };
-  }, [gl, sensitivity, minDistance, maxDistance, onCameraYawChange]);
+  }, [gl, sensitivity, minDistance, maxDistance, isPointerLockDisabled, onCameraYawChange]);
 
   // Frame Update Loop: Camera Position, Smoothing, Collision Raycast, and Dynamic FOV
   useFrame((_, delta) => {

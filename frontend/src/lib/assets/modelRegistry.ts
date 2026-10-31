@@ -13,6 +13,18 @@ import {
   createBoundaryPillarModel,
   createTreeModel,
   createRockModel,
+  createThatchedCottageModel,
+  createTimberHouseModel,
+  createStoneManorModel,
+  createWizardTowerModel,
+  createNordicCabinModel,
+  createFountainModel,
+  createParkBenchModel,
+  createParkLampModel,
+  createFlowerBedModel,
+  createMountainPeakModel,
+  createCherryBlossomTreeModel,
+  createWillowTreeModel,
 } from './proceduralModels';
 
 /**
@@ -30,9 +42,21 @@ export type ModelType =
   | 'guard_tower'
   | 'stone_wall'
   | 'castle_keep'
-  | 'boundary_pillar'
+  | 'house_thatched'
+  | 'house_timber'
+  | 'house_stone'
+  | 'house_wizard'
+  | 'house_cabin'
+  | 'fountain'
+  | 'park_bench'
+  | 'park_lamp'
+  | 'flower_bed'
+  | 'mountain_peak'
   | 'tree_pine'
   | 'tree_oak'
+  | 'tree_cherry'
+  | 'tree_willow'
+  | 'boundary_pillar'
   | 'rock';
 
 export interface ModelBoundingBox {
@@ -164,6 +188,114 @@ export const MODEL_REGISTRY: Record<ModelType, ModelConfig> = {
     proceduralFactory: () => createRockModel(1.2),
     description: 'Weathered granite boulder with mossy highlights.',
   },
+  house_thatched: {
+    id: 'house_thatched',
+    name: 'Thatched Cottage',
+    category: 'structure',
+    gltfUrl: '/models/house_thatched.gltf',
+    boundingBox: { width: 8.0, height: 6.5, depth: 8.0 },
+    proceduralFactory: (opt) => createThatchedCottageModel({ faction: opt?.faction }),
+    description: 'Cozy rustic peasant & artisan cottage with thick straw thatch and woodstove.',
+  },
+  house_timber: {
+    id: 'house_timber',
+    name: 'Timber Half-Timbered House',
+    category: 'structure',
+    gltfUrl: '/models/house_timber.gltf',
+    boundingBox: { width: 9.0, height: 9.0, depth: 9.0 },
+    proceduralFactory: (opt) => createTimberHouseModel({ faction: opt?.faction }),
+    description: 'Two-story medieval merchant guildhouse with jettied upper floors and steep gables.',
+  },
+  house_stone: {
+    id: 'house_stone',
+    name: 'Nordic Stone Manor',
+    category: 'structure',
+    gltfUrl: '/models/house_stone.gltf',
+    boundingBox: { width: 12.0, height: 9.5, depth: 11.0 },
+    proceduralFactory: (opt) => createStoneManorModel({ faction: opt?.faction }),
+    description: 'Sturdy fortified granite estate with slate tiles, corner buttresses, and double chimneys.',
+  },
+  house_wizard: {
+    id: 'house_wizard',
+    name: 'Arcane Wizard Sanctum',
+    category: 'structure',
+    gltfUrl: '/models/house_wizard.gltf',
+    boundingBox: { width: 8.5, height: 17.0, depth: 8.5 },
+    proceduralFactory: (opt) => createWizardTowerModel({ faction: opt?.faction }),
+    description: 'Whimsical alchemist observatory tower crowned with a glowing violet crystal orb.',
+  },
+  house_cabin: {
+    id: 'house_cabin',
+    name: 'Alpine Log Cabin',
+    category: 'structure',
+    gltfUrl: '/models/house_cabin.gltf',
+    boundingBox: { width: 7.5, height: 5.0, depth: 7.5 },
+    proceduralFactory: (opt) => createNordicCabinModel({ faction: opt?.faction }),
+    description: 'Rustic mountain lodge built of interlocking pine logs with a mossy turf roof.',
+  },
+  fountain: {
+    id: 'fountain',
+    name: 'Royal Tiered Fountain',
+    category: 'structure',
+    gltfUrl: '/models/fountain.gltf',
+    boundingBox: { width: 7.2, height: 4.5, depth: 7.2 },
+    proceduralFactory: (opt) => createFountainModel({ faction: opt?.faction }),
+    description: 'Splashing tiered marble fountain serving as civic park and village square centerpiece.',
+  },
+  park_bench: {
+    id: 'park_bench',
+    name: 'Park Bench',
+    category: 'prop',
+    gltfUrl: '/models/park_bench.gltf',
+    boundingBox: { width: 2.2, height: 1.2, depth: 1.0 },
+    proceduralFactory: () => createParkBenchModel(),
+    description: 'Wrought-iron and cedar park bench for weary adventurers.',
+  },
+  park_lamp: {
+    id: 'park_lamp',
+    name: 'Civic Lantern Post',
+    category: 'prop',
+    gltfUrl: '/models/stone_wall.gltf',
+    boundingBox: { width: 0.8, height: 4.5, depth: 0.8 },
+    proceduralFactory: () => createParkLampModel(),
+    description: 'Cast-iron gas lamp casting warm amber luminescence at dusk.',
+  },
+  flower_bed: {
+    id: 'flower_bed',
+    name: 'Park Flower Garden',
+    category: 'prop',
+    gltfUrl: '/models/tree.gltf',
+    boundingBox: { width: 3.5, height: 0.8, depth: 3.5 },
+    proceduralFactory: () => createFlowerBedModel('rose'),
+    description: 'Lush blooming botanical bed with roses, lavender, and marigolds.',
+  },
+  mountain_peak: {
+    id: 'mountain_peak',
+    name: 'Alpine Mountain Peak',
+    category: 'prop',
+    gltfUrl: '/models/stone_wall.gltf',
+    boundingBox: { width: 60.0, height: 55.0, depth: 60.0 },
+    proceduralFactory: () => createMountainPeakModel(1.0),
+    description: 'Towering snow-capped mountain ridge guarding kingdom frontiers.',
+  },
+  tree_cherry: {
+    id: 'tree_cherry',
+    name: 'Blossom Cherry Tree',
+    category: 'prop',
+    gltfUrl: '/models/tree.gltf',
+    boundingBox: { width: 4.5, height: 6.0, depth: 4.5 },
+    proceduralFactory: () => createCherryBlossomTreeModel(),
+    description: 'Vibrant pink blossoming tree native to the Sovereign Gardens.',
+  },
+  tree_willow: {
+    id: 'tree_willow',
+    name: 'Riverbank Weeping Willow',
+    category: 'prop',
+    gltfUrl: '/models/tree.gltf',
+    boundingBox: { width: 5.5, height: 6.5, depth: 5.5 },
+    proceduralFactory: () => createWillowTreeModel(),
+    description: 'Drooping graceful willow lining the Great Divide water channel.',
+  },
 };
 
 // =============================================================================
@@ -176,6 +308,12 @@ export enum StructureTypeEnum {
   GuardTower = 2,
   StoneWall = 3,
   CastleKeep = 4,
+  HouseThatched = 5,
+  HouseTimber = 6,
+  HouseStone = 7,
+  HouseWizard = 8,
+  HouseCabin = 9,
+  Fountain = 10,
 }
 
 export const STRUCTURE_ENUM_TO_MODEL: Record<number, ModelType> = {
@@ -183,6 +321,12 @@ export const STRUCTURE_ENUM_TO_MODEL: Record<number, ModelType> = {
   [StructureTypeEnum.GuardTower]: 'guard_tower',
   [StructureTypeEnum.StoneWall]: 'stone_wall',
   [StructureTypeEnum.CastleKeep]: 'castle_keep',
+  [StructureTypeEnum.HouseThatched]: 'house_thatched',
+  [StructureTypeEnum.HouseTimber]: 'house_timber',
+  [StructureTypeEnum.HouseStone]: 'house_stone',
+  [StructureTypeEnum.HouseWizard]: 'house_wizard',
+  [StructureTypeEnum.HouseCabin]: 'house_cabin',
+  [StructureTypeEnum.Fountain]: 'fountain',
 };
 
 // =============================================================================

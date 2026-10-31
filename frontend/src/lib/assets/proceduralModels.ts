@@ -893,3 +893,603 @@ export function createRockModel(size = 1.0): THREE.Mesh {
   rock.receiveShadow = true;
   return rock;
 }
+
+// =============================================================================
+//                        5. RESIDENTIAL HOUSES & CIVIC PROPS
+// =============================================================================
+
+/**
+ * Style 1: Medieval Thatched Cottage
+ * Cozy peasant & artisan dwelling with curved bulging thatch roof, stone chimney,
+ * wooden porch, warm glowing lantern windows, and firewood stack.
+ */
+export function createThatchedCottageModel(options: { faction?: Faction } = {}): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'House_Thatched';
+
+  const woodMat = createMat(PALETTE.wood.dark, 0.85, 0.05);
+  const wallMat = createMat(0xe2d9c8, 0.9, 0.0); // Warm plaster
+  const stoneMat = createMat(PALETTE.stone.medium, 0.85, 0.1);
+  const thatchMat = createMat(PALETTE.wood.thatch, 0.92, 0.0);
+  const windowMat = createMat(0xfef08a, 0.3, 0.1, 0xf59e0b); // Warm lantern glow
+  const doorMat = createMat(PALETTE.wood.medium, 0.8, 0.05);
+
+  // 1. Cobblestone Foundation
+  const foundation = new THREE.Mesh(new THREE.BoxGeometry(7.2, 0.6, 6.2), stoneMat);
+  foundation.position.set(0, 0.3, 0);
+  group.add(foundation);
+
+  // 2. Plaster Walls
+  const walls = new THREE.Mesh(new THREE.BoxGeometry(6.6, 3.2, 5.6), wallMat);
+  walls.position.set(0, 2.2, 0);
+  group.add(walls);
+
+  // 3. Exposed Timber Framing Corner Posts & Cross-beams
+  const cornerCoords = [
+    [-3.3, -2.8], [3.3, -2.8], [-3.3, 2.8], [3.3, 2.8]
+  ];
+  cornerCoords.forEach(([cx, cz]) => {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.2, 0.35), woodMat);
+    post.position.set(cx, 2.2, cz);
+    group.add(post);
+  });
+
+  // 4. Overhanging Thatched Straw Roof
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(5.2, 3.0, 4), thatchMat);
+  roof.rotation.y = Math.PI / 4;
+  roof.position.set(0, 5.2, 0);
+  roof.scale.set(1.1, 1.0, 0.9);
+  group.add(roof);
+
+  // 5. Cobblestone Side Chimney
+  const chimney = new THREE.Mesh(new THREE.BoxGeometry(1.2, 6.0, 1.2), stoneMat);
+  chimney.position.set(-3.4, 3.0, 0);
+  group.add(chimney);
+
+  const chimneyCap = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.3, 1.4), stoneMat);
+  chimneyCap.position.set(-3.4, 6.1, 0);
+  group.add(chimneyCap);
+
+  // 6. Wooden Entrance Door
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.1, 0.15), doorMat);
+  door.position.set(0.6, 1.65, 2.85);
+  group.add(door);
+
+  // 7. Glowing Windows
+  const win1 = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.0, 0.1), windowMat);
+  win1.position.set(-1.8, 2.4, 2.85);
+  group.add(win1);
+
+  const win2 = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.0, 0.1), windowMat);
+  win2.position.set(1.8, 2.4, -2.85);
+  group.add(win2);
+
+  // 8. Firewood Stack along wall
+  const firewood = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.9, 0.8), woodMat);
+  firewood.position.set(2.2, 1.05, 2.85);
+  group.add(firewood);
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Style 2: Half-Timbered Medieval Townhouse / Villa
+ * Multi-story Tudor house with jettied second floor, steep gabled shingle roof,
+ * decorative diagonal cross-braces, and entrance porch lantern.
+ */
+export function createTimberHouseModel(options: { faction?: Faction } = {}): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'House_Timber';
+
+  const woodDark = createMat(PALETTE.wood.dark, 0.85, 0.05);
+  const plasterMat = createMat(0xf8fafc, 0.92, 0.0);
+  const stoneMat = createMat(PALETTE.stone.dark, 0.85, 0.1);
+  const roofColor = options.faction === 'south' ? PALETTE.south.roof : PALETTE.north.roof;
+  const roofMat = createMat(roofColor, 0.8, 0.1);
+  const windowMat = createMat(0xfef08a, 0.3, 0.1, 0xf59e0b);
+
+  // 1. Dressed Stone Ground Floor
+  const groundFloor = new THREE.Mesh(new THREE.BoxGeometry(8.0, 3.6, 7.0), stoneMat);
+  groundFloor.position.set(0, 1.8, 0);
+  group.add(groundFloor);
+
+  // 2. Overhanging (Jettied) Second Floor
+  const secondFloor = new THREE.Mesh(new THREE.BoxGeometry(8.6, 3.6, 7.6), plasterMat);
+  secondFloor.position.set(0, 5.4, 0);
+  group.add(secondFloor);
+
+  // 3. Exposed Timber Framing across Second Floor
+  const beamFrontHoriz = new THREE.Mesh(new THREE.BoxGeometry(8.7, 0.2, 0.1), woodDark);
+  beamFrontHoriz.position.set(0, 5.4, 3.82);
+  group.add(beamFrontHoriz);
+
+  for (let x = -3.8; x <= 3.8; x += 1.9) {
+    const vBeam = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3.6, 0.1), woodDark);
+    vBeam.position.set(x, 5.4, 3.82);
+    group.add(vBeam);
+  }
+
+  // 4. Steep Gabled Roof
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(6.4, 3.8, 4), roofMat);
+  roof.rotation.y = Math.PI / 4;
+  roof.scale.set(1.15, 1.0, 0.95);
+  roof.position.set(0, 9.1, 0);
+  group.add(roof);
+
+  // 5. Grand Chimney
+  const chimney = new THREE.Mesh(new THREE.BoxGeometry(1.4, 9.5, 1.4), stoneMat);
+  chimney.position.set(3.8, 4.75, 1.8);
+  group.add(chimney);
+
+  // 6. Ground Floor Wooden Door
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.4, 0.2), woodDark);
+  door.position.set(0, 1.2, 3.52);
+  group.add(door);
+
+  // 7. Glowing Mullioned Windows (Ground & 2nd floor)
+  const winPositions = [
+    [-2.2, 1.8, 3.52], [2.2, 1.8, 3.52],
+    [-2.2, 5.6, 3.85], [0, 5.6, 3.85], [2.2, 5.6, 3.85]
+  ];
+  winPositions.forEach(([wx, wy, wz]) => {
+    const win = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 0.1), windowMat);
+    win.position.set(wx, wy, wz);
+    group.add(win);
+  });
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Style 3: Fortified Nordic Stone Manor
+ * Solid granite homestead with slate roof, arched portal, corner buttresses,
+ * high chimneys, and iron crest lanterns.
+ */
+export function createStoneManorModel(options: { faction?: Faction } = {}): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'House_Stone';
+
+  const stoneMain = createMat(PALETTE.stone.dark, 0.88, 0.12);
+  const stoneTrim = createMat(PALETTE.stone.light, 0.8, 0.15);
+  const slateRoof = createMat(0x1e293b, 0.75, 0.2); // Midnight slate
+  const doorWood = createMat(PALETTE.wood.dark, 0.8, 0.1);
+  const warmLight = createMat(0xfef08a, 0.2, 0.1, 0xf59e0b);
+
+  // 1. Massive Stone Wing
+  const mainHall = new THREE.Mesh(new THREE.BoxGeometry(11.0, 5.5, 9.0), stoneMain);
+  mainHall.position.set(0, 2.75, 0);
+  group.add(mainHall);
+
+  // 2. Corner Buttresses
+  const buttressOffsets = [
+    [-5.6, -4.6], [5.6, -4.6], [-5.6, 4.6], [5.6, 4.6]
+  ];
+  buttressOffsets.forEach(([bx, bz]) => {
+    const buttress = new THREE.Mesh(new THREE.BoxGeometry(1.2, 5.8, 1.2), stoneTrim);
+    buttress.position.set(bx, 2.9, bz);
+    group.add(buttress);
+  });
+
+  // 3. Arched Portal Entrance
+  const portalArch = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.8, 1.2), stoneTrim);
+  portalArch.position.set(0, 1.9, 4.8);
+  group.add(portalArch);
+
+  const doubleDoors = new THREE.Mesh(new THREE.BoxGeometry(2.0, 2.8, 0.2), doorWood);
+  doubleDoors.position.set(0, 1.4, 5.35);
+  group.add(doubleDoors);
+
+  // 4. Slate Roof with Stone End Gables
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(8.5, 4.2, 4), slateRoof);
+  roof.rotation.y = Math.PI / 4;
+  roof.scale.set(1.1, 1.0, 0.9);
+  roof.position.set(0, 7.6, 0);
+  group.add(roof);
+
+  // 5. Twin Stone Chimneys
+  [-3.8, 3.8].forEach((cx) => {
+    const ch = new THREE.Mesh(new THREE.BoxGeometry(1.4, 8.5, 1.4), stoneTrim);
+    ch.position.set(cx, 5.25, 0);
+    group.add(ch);
+  });
+
+  // 6. Arched Leaded Windows
+  [[-3.2, 3.2], [3.2, 3.2]].forEach(([wx, wz]) => {
+    const win = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.8, 0.1), warmLight);
+    win.position.set(wx, 3.0, 4.52);
+    group.add(win);
+  });
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Style 4: Arcane Wizard's Sanctum / Alchemist Tower
+ * Whimsical conical observatory tower with glowing arcane orb atop the spire,
+ * attached timber alchemy lab, outdoor staircase, and glowing crystal aura.
+ */
+export function createWizardTowerModel(options: { faction?: Faction } = {}): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'House_Wizard';
+
+  const towerStone = createMat(0x312e81, 0.85, 0.15); // Indigo slate
+  const trimStone = createMat(0x4338ca, 0.8, 0.2);
+  const conicalRoofMat = createMat(0x1e1b4b, 0.75, 0.2);
+  const woodMat = createMat(PALETTE.wood.dark, 0.85, 0.05);
+  const arcaneGlow = createMat(0x818cf8, 0.2, 0.4, 0x6366f1); // Violet magic glow
+
+  // 1. Tall Cylindrical Stone Tower
+  const tower = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 3.4, 11.0, 10), towerStone);
+  tower.position.set(0, 5.5, 0);
+  group.add(tower);
+
+  // 2. Tower Mid-Ring Balcony
+  const balcony = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.2, 0.6, 10), trimStone);
+  balcony.position.set(0, 8.0, 0);
+  group.add(balcony);
+
+  // 3. Conical Spire Roof
+  const spire = new THREE.Mesh(new THREE.ConeGeometry(3.6, 5.5, 10), conicalRoofMat);
+  spire.position.set(0, 13.5, 0);
+  group.add(spire);
+
+  // 4. Glowing Arcane Crystal Orb at the Spire Peak
+  const orb = new THREE.Mesh(new THREE.OctahedronGeometry(0.8, 0), arcaneGlow);
+  orb.position.set(0, 16.6, 0);
+  orb.name = 'ArcaneCrystalOrb';
+  group.add(orb);
+
+  // 5. Attached Alchemy Lab Cottage
+  const annex = new THREE.Mesh(new THREE.BoxGeometry(4.2, 3.5, 3.8), createMat(0x475569, 0.9, 0.05));
+  annex.position.set(3.4, 1.75, 0);
+  group.add(annex);
+
+  const annexRoof = new THREE.Mesh(new THREE.ConeGeometry(3.2, 2.2, 4), conicalRoofMat);
+  annexRoof.rotation.y = Math.PI / 4;
+  annexRoof.position.set(3.4, 4.4, 0);
+  group.add(annexRoof);
+
+  // 6. Glowing Arcane Windows
+  const win = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.4, 0.1), arcaneGlow);
+  win.position.set(0, 9.5, 2.8);
+  group.add(win);
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Style 5: Alpine Log Cabin / Woodsman Lodge
+ * Rustic timber logs, mossy turf roof, front covered porch with railings.
+ */
+export function createNordicCabinModel(options: { faction?: Faction } = {}): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'House_Cabin';
+
+  const logMat = createMat(PALETTE.wood.medium, 0.85, 0.05);
+  const darkLogMat = createMat(PALETTE.wood.dark, 0.9, 0.05);
+  const turfRoof = createMat(0x2d4a22, 0.95, 0.0); // Mossy pine green
+  const stoneMat = createMat(PALETTE.stone.dark, 0.9, 0.1);
+  const windowMat = createMat(0xfef08a, 0.3, 0.1, 0xf59e0b);
+
+  // 1. Foundation
+  const base = new THREE.Mesh(new THREE.BoxGeometry(6.6, 0.5, 6.2), stoneMat);
+  base.position.set(0, 0.25, 0);
+  group.add(base);
+
+  // 2. Horizontal Log Wall Simulation
+  const cabinBody = new THREE.Mesh(new THREE.BoxGeometry(6.0, 3.0, 5.6), logMat);
+  cabinBody.position.set(0, 1.75, 0);
+  group.add(cabinBody);
+
+  // 3. Low-sloping Roof
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(5.0, 2.4, 4), turfRoof);
+  roof.rotation.y = Math.PI / 4;
+  roof.scale.set(1.2, 0.9, 1.0);
+  roof.position.set(0, 4.0, 0);
+  group.add(roof);
+
+  // 4. Front Porch with 2 Wooden Posts
+  [-2.2, 2.2].forEach((px) => {
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 2.6, 6), darkLogMat);
+    post.position.set(px, 1.3, 3.2);
+    group.add(post);
+  });
+
+  // 5. Door & Window
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.0, 0.15), darkLogMat);
+  door.position.set(0.6, 1.25, 2.85);
+  group.add(door);
+
+  const win = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.0, 0.1), windowMat);
+  win.position.set(-1.6, 1.8, 2.85);
+  group.add(win);
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Royal Tiered Stone Civic Fountain
+ * Centerpiece for parks and village squares with ornate carved basins,
+ * central column, and translucent shimmering water surface.
+ */
+export function createFountainModel(options: { faction?: Faction } = {}): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'Fountain_Royal';
+
+  const stoneMat = createMat(PALETTE.stone.light, 0.78, 0.15);
+  const darkStone = createMat(PALETTE.stone.dark, 0.85, 0.1);
+  const waterMat = new THREE.MeshStandardMaterial({
+    color: 0x38bdf8,
+    roughness: 0.1,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0.78,
+  });
+
+  // 1. Outer Large Octagonal / Circular Basin Rim
+  const outerBasinRim = new THREE.Mesh(
+    new THREE.CylinderGeometry(3.4, 3.6, 0.8, 12),
+    stoneMat
+  );
+  outerBasinRim.position.set(0, 0.4, 0);
+  group.add(outerBasinRim);
+
+  // 2. Pool Water Surface
+  const poolWater = new THREE.Mesh(
+    new THREE.CylinderGeometry(3.15, 3.15, 0.1, 12),
+    waterMat
+  );
+  poolWater.position.set(0, 0.65, 0);
+  group.add(poolWater);
+
+  // 3. Central Carved Column
+  const column = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.7, 0.9, 2.8, 8),
+    darkStone
+  );
+  column.position.set(0, 1.8, 0);
+  group.add(column);
+
+  // 4. Mid-Tier Water Basin
+  const midBowl = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.8, 1.3, 0.5, 10),
+    stoneMat
+  );
+  midBowl.position.set(0, 2.4, 0);
+  group.add(midBowl);
+
+  const midWater = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.65, 1.65, 0.08, 10),
+    waterMat
+  );
+  midWater.position.set(0, 2.58, 0);
+  group.add(midWater);
+
+  // 5. Upper Spire Column & Small Basin
+  const upperSpire = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4, 0.5, 1.4, 8),
+    darkStone
+  );
+  upperSpire.position.set(0, 3.3, 0);
+  group.add(upperSpire);
+
+  const topBowl = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.9, 0.6, 0.35, 8),
+    stoneMat
+  );
+  topBowl.position.set(0, 3.8, 0);
+  group.add(topBowl);
+
+  // 6. Top Water Jet Finial
+  const finial = new THREE.Mesh(
+    new THREE.SphereGeometry(0.28, 8, 8),
+    waterMat
+  );
+  finial.position.set(0, 4.2, 0);
+  group.add(finial);
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Public Park Props: Benches, Lampposts, and Flowerbeds
+ */
+export function createParkBenchModel(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'Park_Bench';
+
+  const ironMat = createMat(PALETTE.metal.iron, 0.7, 0.4);
+  const woodMat = createMat(PALETTE.wood.medium, 0.85, 0.05);
+
+  // Legs / Armrests
+  [-0.9, 0.9].forEach((bx) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.7, 0.7), ironMat);
+    leg.position.set(bx, 0.35, 0);
+    group.add(leg);
+  });
+
+  // Seat Slats
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.08, 0.55), woodMat);
+  seat.position.set(0, 0.45, 0.05);
+  group.add(seat);
+
+  // Backrest Slats
+  const back = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.45, 0.08), woodMat);
+  back.position.set(0, 0.85, -0.22);
+  back.rotation.x = -0.15;
+  group.add(back);
+
+  enableShadows(group);
+  return group;
+}
+
+export function createParkLampModel(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'Park_Lamp';
+
+  const ironMat = createMat(PALETTE.metal.iron, 0.65, 0.4);
+  const lanternGlass = createMat(0xfef08a, 0.2, 0.1, 0xfde047);
+
+  // Post & Base
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.45, 0.4, 6), ironMat);
+  base.position.set(0, 0.2, 0);
+  group.add(base);
+
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 3.8, 6), ironMat);
+  post.position.set(0, 2.1, 0);
+  group.add(post);
+
+  // Top Lantern
+  const lantern = new THREE.Mesh(new THREE.OctahedronGeometry(0.35, 0), lanternGlass);
+  lantern.position.set(0, 4.1, 0);
+  group.add(lantern);
+
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.48, 0.35, 4), ironMat);
+  cap.position.set(0, 4.45, 0);
+  group.add(cap);
+
+  enableShadows(group);
+  return group;
+}
+
+export function createFlowerBedModel(type: 'rose' | 'lavender' | 'marigold' = 'rose'): THREE.Group {
+  const group = new THREE.Group();
+  group.name = `FlowerBed_${type}`;
+
+  const stoneRim = createMat(PALETTE.stone.moss, 0.9, 0.05);
+  const soilMat = createMat(PALETTE.foliage.soil, 0.95, 0.0);
+
+  const flowerColors = {
+    rose: 0xef4444,     // Red
+    lavender: 0xa855f7, // Violet/Purple
+    marigold: 0xf59e0b, // Amber/Orange
+  };
+  const petalMat = createMat(flowerColors[type] || 0xef4444, 0.7, 0.0);
+  const stemMat = createMat(PALETTE.foliage.grass, 0.85, 0.0);
+
+  // Border stone kerb
+  const kerb = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.7, 0.25, 8), stoneRim);
+  kerb.position.set(0, 0.12, 0);
+  group.add(kerb);
+
+  const soil = new THREE.Mesh(new THREE.CylinderGeometry(1.45, 1.45, 0.15, 8), soilMat);
+  soil.position.set(0, 0.22, 0);
+  group.add(soil);
+
+  // Scattered Flower blossoms
+  for (let i = 0; i < 14; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = Math.random() * 1.15;
+    const fx = Math.cos(angle) * r;
+    const fz = Math.sin(angle) * r;
+    const fh = 0.25 + Math.random() * 0.2;
+
+    const blossom = new THREE.Mesh(new THREE.DodecahedronGeometry(0.12, 0), petalMat);
+    blossom.position.set(fx, 0.25 + fh, fz);
+    group.add(blossom);
+
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, fh, 4), stemMat);
+    stem.position.set(fx, 0.25 + fh / 2, fz);
+    group.add(stem);
+  }
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Towering Mountain Peak with Snowy Cap
+ */
+export function createMountainPeakModel(scale = 1.0): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'Mountain_Peak';
+
+  const rockMat = createMat(0x334155, 0.9, 0.08); // Dark mountain slate
+  const snowMat = createMat(0xf8fafc, 0.82, 0.05); // Glacier snow
+
+  // Craggy Lower Peak Body
+  const baseGeo = new THREE.ConeGeometry(38 * scale, 55 * scale, 7);
+  // Deform vertices for rugged alpine facet silhouette
+  const pos = baseGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i);
+    if (y < 20 * scale) {
+      pos.setX(i, pos.getX(i) * (0.85 + ((i % 5) * 0.06)));
+      pos.setZ(i, pos.getZ(i) * (0.85 + ((i % 7) * 0.05)));
+    }
+  }
+  baseGeo.computeVertexNormals();
+
+  const baseMesh = new THREE.Mesh(baseGeo, rockMat);
+  baseMesh.position.set(0, 27.5 * scale, 0);
+  group.add(baseMesh);
+
+  // Snow-capped Summit Cap
+  const snowCapGeo = new THREE.ConeGeometry(16 * scale, 22 * scale, 7);
+  const snowCap = new THREE.Mesh(snowCapGeo, snowMat);
+  snowCap.position.set(0, 44 * scale, 0);
+  group.add(snowCap);
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Flowering Cherry Blossom Tree for the Royal Park
+ */
+export function createCherryBlossomTreeModel(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'Tree_CherryBlossom';
+
+  const trunkMat = createMat(0x451a03, 0.9, 0.0);
+  const blossomMat = createMat(0xf472b6, 0.8, 0.0); // Vivid pink blossoms
+
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.45, 3.8, 6), trunkMat);
+  trunk.position.set(0, 1.9, 0);
+  group.add(trunk);
+
+  const clusters = [
+    { r: 1.8, x: 0, y: 4.2, z: 0 },
+    { r: 1.4, x: -0.9, y: 3.7, z: 0.6 },
+    { r: 1.5, x: 0.9, y: 3.8, z: -0.5 },
+    { r: 1.2, x: 0, y: 5.1, z: 0.2 },
+  ];
+  clusters.forEach(c => {
+    const puff = new THREE.Mesh(new THREE.DodecahedronGeometry(c.r, 0), blossomMat);
+    puff.position.set(c.x, c.y, c.z);
+    group.add(puff);
+  });
+
+  enableShadows(group);
+  return group;
+}
+
+/**
+ * Weeping Willow Tree for Riverbanks & Watersides
+ */
+export function createWillowTreeModel(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'Tree_Willow';
+
+  const trunkMat = createMat(0x3e2723, 0.9, 0.0);
+  const willowMat = createMat(0x65a30d, 0.85, 0.0); // Drooping lime-green leaves
+
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.6, 4.0, 6), trunkMat);
+  trunk.position.set(0, 2.0, 0);
+  group.add(trunk);
+
+  // Drooping canopy domes
+  const crown = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 3.2, 3.0, 8), willowMat);
+  crown.position.set(0, 4.4, 0);
+  group.add(crown);
+
+  enableShadows(group);
+  return group;
+}
+

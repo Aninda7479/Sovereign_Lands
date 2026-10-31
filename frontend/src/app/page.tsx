@@ -13,18 +13,17 @@ import { QuestObjectiveHUD } from '@/components/minimap/QuestObjectiveHUD';
 import { InteractionPrompt, PromptActionType } from '@/components/web3-hud/InteractionPrompt';
 import { DialogueHUD } from '@/components/npc-dialogue/DialogueHUD';
 import { CitadelCouncilModal } from '@/components/web3-hud/CitadelCouncilModal';
-import { AISettingsModal } from '@/components/ai-connection/AISettingsModal';
 import { GameSettingsModal } from '@/components/settings/GameSettingsModal';
-import { AIStatusBadge } from '@/components/ai-connection/AIStatusBadge';
+import { PauseEscapeMenu } from '@/components/settings/PauseEscapeMenu';
 import { TacticalOverlayHUD } from '@/components/tactical-map/TacticalOverlayHUD';
 import { TransactionToast, TxStatus } from '@/components/web3-hud/TransactionToast';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
-import { UnderConstruction } from '@/components/ui/UnderConstruction';
 
 import { useParcelContract } from '@/hooks/web3/useParcelContract';
 import { useKingdomTreasury } from '@/hooks/web3/useKingdomTreasury';
 import { getParcelAtPosition, ParcelEntity } from '@/lib/world/parcelCoordinates';
 import { StructureTypeEnum } from '@/lib/assets/modelRegistry';
+import { soundManager } from '@/lib/audio/SoundManager';
 
 /**
  * Inner Game Content connecting 3D Canvas, Web3 contracts, and GTA-style HUD overlays.
@@ -51,17 +50,37 @@ function GameWorldContent() {
   const [activeWaypoint, setActiveWaypoint] = useState<WaypointData | null>(null);
 
   // Modals & Dialogue UI state
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [settingsInitialTab, setSettingsInitialTab] = useState<
+    'wallet' | 'ai' | 'controls' | 'kingdom' | 'display'
+  >('wallet');
   const [isCouncilOpen, setIsCouncilOpen] = useState(false);
   const [isTacticalOpen, setIsTacticalOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeNpc, setActiveNpc] = useState<string | null>(null);
   const [isBuildingMode, setIsBuildingMode] = useState(false);
-  const [showRadar, setShowRadar] = useState(true);
-  const [showCompass, setShowCompass] = useState(true);
-  const [showPostProcessing, setShowPostProcessing] = useState(true);
+
+  // Clean Screen & HUD Density State (Defaults set to clean & uncluttered)
+  const [showRadar, setShowRadar] = useState<boolean>(true);
+  const [showCompass, setShowCompass] = useState<boolean>(false); // Hidden by default for clean screen
+  const [showQuestHUD, setShowQuestHUD] = useState<boolean>(false); // Hidden by default for clean screen
+  const [showPostProcessing, setShowPostProcessing] = useState<boolean>(true);
+  const [graphicsQuality, setGraphicsQuality] = useState<'low' | 'medium' | 'high'>('medium');
+
   const [buildStructureType, setBuildStructureType] = useState<StructureTypeEnum>(
     StructureTypeEnum.Farmstead
   );
+
+  // Check if any modal or menu is actively obstructing gameplay
+  const isAnyModalOpen = useMemo(() => {
+    return (
+      isPaused ||
+      isSettingsOpen ||
+      isCouncilOpen ||
+      isTacticalOpen ||
+      Boolean(activeNpc)
+    );
+  }, [isPaused, isSettingsOpen, isCouncilOpen, isTacticalOpen, activeNpc]);
 
   // Transaction Toast state
   const [txToast, setTxToast] = useState<{
@@ -89,7 +108,7 @@ function GameWorldContent() {
   // Determine current contextual prompt action
   const promptAction = useMemo<PromptActionType | null>(() => {
     // If dialogue or modal is open, suppress world prompts
-    if (activeNpc || isCouncilOpen || isTacticalOpen || isSettingsOpen) {
+    if (isAnyModalOpen) {
       return null;
     }
 
@@ -126,10 +145,7 @@ function GameWorldContent() {
 
     return null;
   }, [
-    activeNpc,
-    isCouncilOpen,
-    isTacticalOpen,
-    isSettingsOpen,
+    isAnyModalOpen,
     isNearWarTable,
     currentParcel,
     address,
@@ -206,7 +222,15 @@ function GameWorldContent() {
     }
   }, [promptAction, handleClaimOrBuy, handleHarvestGold]);
 
-  // Keyboard Shortcuts for GTA-style Interaction
+  // Respawn Handler
+  const handleRespawn = useCallback(() => {
+    setPlayerPosition([0, 2.0, 0]);
+    if (gameState.setPlayerPosition) {
+      gameState.setPlayerPosition([0, 2.0, 0]);
+    }
+  }, [gameState]);
+
+  // Keyboard Shortcuts for GTA-style Interaction & Escape Pause Menu
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if typing in text inputs
@@ -217,18 +241,44 @@ function GameWorldContent() {
         return;
       }
 
-      if (e.key === 'Escape') {
-        if (isSettingsOpen || isCouncilOpen || isTacticalOpen || activeNpc || isBuildingMode) {
-          setIsCouncilOpen(false);
-          setIsTacticalOpen(false);
-          setIsSettingsOpen(false);
+      // Escape or X key: Pause Menu / Back / Close
+      if (e.key === 'Escape' || e.key === 'x' || e.key === 'X') {
+        if (activeNpc) {
           setActiveNpc(null);
-          setIsBuildingMode(false);
-          return;
-        } else {
-          setIsSettingsOpen(true);
           return;
         }
+        if (isSettingsOpen) {
+          setIsSettingsOpen(false);
+          return;
+        }
+        if (isCouncilOpen) {
+          setIsCouncilOpen(false);
+          return;
+        }
+        if (isTacticalOpen) {
+          setIsTacticalOpen(false);
+          return;
+        }
+        if (isBuildingMode) {
+          setIsBuildingMode(false);
+          return;
+        }
+
+        // Toggle Escape Pause Menu
+        setIsPaused((prev) => {
+          const next = !prev;
+          soundManager.playMenuChime(next);
+          if (next && typeof document !== 'undefined' && document.pointerLockElement) {
+            document.exitPointerLock?.();
+          }
+          return next;
+        });
+        return;
+      }
+
+      // If pause menu or any modal is open, suppress world hotkeys
+      if (isAnyModalOpen) {
+        return;
       }
 
       if (e.key === 'b' || e.key === 'B') {
@@ -247,14 +297,26 @@ function GameWorldContent() {
         setIsCouncilOpen((prev) => !prev);
       } else if (e.key === 'm' || e.key === 'M') {
         setIsTacticalOpen((prev) => !prev);
-      } else if (e.key === 'k' || e.key === 'K' || e.key === 'Escape') {
-        setIsSettingsOpen((prev) => !prev);
+      } else if (e.key === 'j' || e.key === 'J' || e.key === 'o' || e.key === 'O') {
+        // Quest HUD quick toggle
+        setShowQuestHUD((prev) => !prev);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [promptAction, handleClaimOrBuy, handleHarvestGold, isNearWarTable]);
+  }, [
+    isAnyModalOpen,
+    activeNpc,
+    isSettingsOpen,
+    isCouncilOpen,
+    isTacticalOpen,
+    isBuildingMode,
+    promptAction,
+    handleClaimOrBuy,
+    handleHarvestGold,
+    isNearWarTable,
+  ]);
 
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-black select-none">
@@ -274,18 +336,25 @@ function GameWorldContent() {
           buildStructureType={buildStructureType}
           showLighting={true}
           showPostProcessing={false} // Canvas already has outer vignette
+          isPointerLockDisabled={isAnyModalOpen}
         />
       </GameCanvas>
 
       {/* 2D HUD Overlays */}
-      {/* Top Resource HUD, Wallet & Settings Control */}
+      {/* Top Resource HUD (Cleaned: Connect Wallet moved into Settings) */}
       <TopResourceHUD
         onOpenCouncil={() => setIsCouncilOpen(true)}
         onOpenBuildMenu={() => setIsBuildingMode((prev) => !prev)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSettings={() => {
+          setIsPaused(true);
+          soundManager.playMenuChime(true);
+          if (typeof document !== 'undefined' && document.pointerLockElement) {
+            document.exitPointerLock?.();
+          }
+        }}
       />
 
-      {/* Top Compass Heading Tape (Toggleable in Settings) */}
+      {/* Top Compass Heading Tape (Toggleable in Settings, Default Hidden) */}
       {showCompass && (
         <Suspense fallback={null}>
           <CompassHeading
@@ -296,13 +365,15 @@ function GameWorldContent() {
         </Suspense>
       )}
 
-      {/* GTA-style Mission Tracker (Clean, default collapsed in top-left) */}
-      <Suspense fallback={null}>
-        <QuestObjectiveHUD
-          onWaypointChange={setActiveWaypoint}
-          defaultCollapsed={true}
-        />
-      </Suspense>
+      {/* GTA-style Mission Tracker (Toggleable in Settings, Default Hidden) */}
+      {showQuestHUD && (
+        <Suspense fallback={null}>
+          <QuestObjectiveHUD
+            onWaypointChange={setActiveWaypoint}
+            defaultCollapsed={false}
+          />
+        </Suspense>
+      )}
 
       {/* Circular Radar Mini-Map in Bottom-Left (Toggleable in Settings) */}
       {showRadar && (
@@ -351,18 +422,46 @@ function GameWorldContent() {
         playerKingdom={currentParcel?.kingdom === 'South' ? 'South' : 'North'}
       />
 
-      {/* Master Settings Hub (AI Key Vault, Controls, Realm, Graphics) */}
+      {/* Dedicated Escape / Pause Action Menu ([Esc] or [X]) */}
+      <PauseEscapeMenu
+        isOpen={isPaused && !isSettingsOpen}
+        onResume={() => setIsPaused(false)}
+        onOpenSettings={(tab) => {
+          if (tab) setSettingsInitialTab(tab);
+          setIsSettingsOpen(true);
+        }}
+        onRespawn={handleRespawn}
+        hudSettings={{
+          showRadar,
+          setShowRadar,
+          showCompass,
+          setShowCompass,
+          showQuestHUD,
+          setShowQuestHUD,
+          showPostProcessing,
+          setShowPostProcessing,
+        }}
+        graphicsQuality={graphicsQuality}
+        setGraphicsQuality={setGraphicsQuality}
+      />
+
+      {/* Master Settings Hub (Wallet, AI Key Vault, Controls, Display, Realm) */}
       <GameSettingsModal
         isOpen={isSettingsOpen}
+        initialTab={settingsInitialTab}
         onClose={() => setIsSettingsOpen(false)}
         hudSettings={{
           showRadar,
           setShowRadar,
           showCompass,
           setShowCompass,
+          showQuestHUD,
+          setShowQuestHUD,
           showPostProcessing,
           setShowPostProcessing,
         }}
+        graphicsQuality={graphicsQuality}
+        setGraphicsQuality={setGraphicsQuality}
       />
 
       {/* Web3 Mining & Confirmation Toast */}

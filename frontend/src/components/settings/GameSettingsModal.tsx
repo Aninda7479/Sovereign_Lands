@@ -25,7 +25,16 @@ import {
   Coins,
   Monitor,
   Volume2,
+  VolumeX,
+  Wallet,
+  LogOut,
+  Copy,
+  Check,
+  Compass,
+  Scroll,
+  MapPin,
 } from 'lucide-react';
+import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } from 'wagmi';
 import { keyVault } from '../../../../ai-system/providers/KeyVault';
 import {
   AIProviderType,
@@ -34,19 +43,24 @@ import {
 } from '../../../../ai-system/providers/types';
 import { useParcelContract } from '@/hooks/web3/useParcelContract';
 import { useKingdomTreasury } from '@/hooks/web3/useKingdomTreasury';
+import { soundManager, AudioSettings } from '@/lib/audio/SoundManager';
 
 export interface GameSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'ai' | 'controls' | 'kingdom' | 'display';
+  initialTab?: 'wallet' | 'ai' | 'controls' | 'kingdom' | 'display';
   hudSettings?: {
     showRadar: boolean;
     setShowRadar: (show: boolean) => void;
     showCompass: boolean;
     setShowCompass: (show: boolean) => void;
+    showQuestHUD?: boolean;
+    setShowQuestHUD?: (show: boolean) => void;
     showPostProcessing: boolean;
     setShowPostProcessing: (show: boolean) => void;
   };
+  graphicsQuality?: 'low' | 'medium' | 'high';
+  setGraphicsQuality?: (quality: 'low' | 'medium' | 'high') => void;
 }
 
 interface ProviderMeta {
@@ -116,10 +130,14 @@ const PROVIDERS: ProviderMeta[] = [
 export function GameSettingsModal({
   isOpen,
   onClose,
-  initialTab = 'ai',
+  initialTab = 'wallet',
   hudSettings,
+  graphicsQuality = 'medium',
+  setGraphicsQuality,
 }: GameSettingsModalProps) {
-  const [activeTab, setActiveTab] = useState<'ai' | 'controls' | 'kingdom' | 'display'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'wallet' | 'ai' | 'controls' | 'kingdom' | 'display'>(
+    initialTab
+  );
 
   // Synchronize initialTab if provided
   useEffect(() => {
@@ -127,6 +145,14 @@ export function GameSettingsModal({
       setActiveTab(initialTab);
     }
   }, [isOpen, initialTab]);
+
+  // Web3 State
+  const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
+  const [copiedAddress, setCopiedAddress] = useState(false);
 
   // AI Tab State
   const [selectedProvider, setSelectedProvider] = useState<AIProviderType>('gemini');
@@ -138,6 +164,12 @@ export function GameSettingsModal({
   const [isTesting, setIsTesting] = useState<boolean>(false);
   const [testResult, setTestResult] = useState<ConnectionTestResult | null>(null);
   const [saveSuccessNotice, setSaveSuccessNotice] = useState<boolean>(false);
+
+  // Audio state
+  const [audioSettings, setAudioSettings] = useState<AudioSettings>(soundManager.getSettings());
+  useEffect(() => {
+    return soundManager.subscribe((s) => setAudioSettings(s));
+  }, []);
 
   // Web3 / Kingdom State
   const { playerGold, playerParcels } = useParcelContract();
@@ -173,6 +205,7 @@ export function GameSettingsModal({
   };
 
   const handleProviderSelect = (provider: AIProviderType) => {
+    soundManager.playClick();
     setSelectedProvider(provider);
     loadProviderState(provider);
   };
@@ -183,6 +216,7 @@ export function GameSettingsModal({
 
   // Handle Save & Activate
   const handleSaveAndActivate = async () => {
+    soundManager.playClick();
     keyVault.updateConfig(selectedProvider, {
       apiKey: apiKeyInput.trim(),
       model: selectedModel || currentMeta.defaultModels[0],
@@ -223,15 +257,33 @@ export function GameSettingsModal({
   };
 
   const handleClearKey = () => {
+    soundManager.playClick();
     keyVault.removeApiKey(selectedProvider);
     setApiKeyInput('');
     setTestResult(null);
   };
 
+  const handleCopyAddress = () => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      setCopiedAddress(true);
+      soundManager.playClick();
+      setTimeout(() => setCopiedAddress(false), 2000);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in select-none">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200 select-none"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          soundManager.playClick();
+          onClose();
+        }
+      }}
+    >
       <div
         className="relative w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl border border-zinc-800 bg-zinc-950/95 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -247,12 +299,15 @@ export function GameSettingsModal({
                 Kingdom Settings & Control Center
               </h2>
               <p className="text-xs text-zinc-400">
-                Configure your Bring-Your-Own-AI brain, hotkeys, realm governance, and graphics.
+                Manage your Web3 Wallet, Bring-Your-Own-AI brain, HUD visibility, keybindings, and audio.
               </p>
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={() => {
+              soundManager.playClick();
+              onClose();
+            }}
             className="flex items-center justify-center w-9 h-9 rounded-xl border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition"
           >
             <X className="w-4 h-4" />
@@ -261,8 +316,31 @@ export function GameSettingsModal({
 
         {/* TOP TAB NAVIGATION BAR */}
         <div className="flex items-center gap-1 px-6 py-2.5 bg-zinc-900/60 border-b border-zinc-800/60 overflow-x-auto">
+          {/* TAB 1: WEB3 & WALLET */}
           <button
-            onClick={() => setActiveTab('ai')}
+            onClick={() => {
+              soundManager.playClick();
+              setActiveTab('wallet');
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+              activeTab === 'wallet'
+                ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-md'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+            }`}
+          >
+            <Wallet className="w-4 h-4" />
+            <span>Web3 & Wallet</span>
+            {isConnected && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+            )}
+          </button>
+
+          {/* TAB 2: AI BRAIN */}
+          <button
+            onClick={() => {
+              soundManager.playClick();
+              setActiveTab('ai');
+            }}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
               activeTab === 'ai'
                 ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-md'
@@ -276,8 +354,28 @@ export function GameSettingsModal({
             )}
           </button>
 
+          {/* TAB 3: DISPLAY & CLEAN SCREEN */}
           <button
-            onClick={() => setActiveTab('controls')}
+            onClick={() => {
+              soundManager.playClick();
+              setActiveTab('display');
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+              activeTab === 'display'
+                ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-md'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+            }`}
+          >
+            <Monitor className="w-4 h-4" />
+            <span>Display & Clean HUD</span>
+          </button>
+
+          {/* TAB 4: CONTROLS */}
+          <button
+            onClick={() => {
+              soundManager.playClick();
+              setActiveTab('controls');
+            }}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
               activeTab === 'controls'
                 ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-md'
@@ -288,8 +386,12 @@ export function GameSettingsModal({
             <span>Controls & Hotkeys</span>
           </button>
 
+          {/* TAB 5: KINGDOM */}
           <button
-            onClick={() => setActiveTab('kingdom')}
+            onClick={() => {
+              soundManager.playClick();
+              setActiveTab('kingdom');
+            }}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
               activeTab === 'kingdom'
                 ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-md'
@@ -299,24 +401,178 @@ export function GameSettingsModal({
             <Landmark className="w-4 h-4" />
             <span>Kingdom & Governance</span>
           </button>
-
-          <button
-            onClick={() => setActiveTab('display')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
-              activeTab === 'display'
-                ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-md'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
-            }`}
-          >
-            <Monitor className="w-4 h-4" />
-            <span>Display & Clean HUD</span>
-          </button>
         </div>
 
         {/* MODAL CONTENT BODY */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* ========================================================================= */}
-          {/* TAB 1: AI BRAIN & KEY VAULT                                               */}
+          {/* TAB 1: WEB3 & WALLET (MOVED OFF HOME SCREEN PER REQUEST)                   */}
+          {/* ========================================================================= */}
+          {activeTab === 'wallet' && (
+            <div className="space-y-6">
+              {/* Wallet Status Card */}
+              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900/50 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-400/40 flex items-center justify-center text-amber-400">
+                      <Wallet className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm text-zinc-100">Web3 Sovereign Identity</h3>
+                      <p className="text-xs text-zinc-400">
+                        Connect MetaMask to sign verifiable on-chain parcel deeds and Citadel decrees.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`w-2.5 h-2.5 rounded-full ${
+                        isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-500'
+                      }`}
+                    />
+                    <span className="text-xs font-mono font-bold text-zinc-300">
+                      {isConnected ? 'Wallet Connected' : 'Guest / Offline Mode'}
+                    </span>
+                  </div>
+                </div>
+
+                {isConnected ? (
+                  <div className="space-y-4 pt-2 border-t border-zinc-800">
+                    {/* Connected Address Details */}
+                    <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <div className="overflow-hidden">
+                          <div className="text-[10px] text-emerald-300/80 font-mono">
+                            CONNECTED ADDRESS
+                          </div>
+                          <div className="font-mono text-xs text-zinc-200 font-bold truncate">
+                            {address}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={handleCopyAddress}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-xs text-zinc-300 transition"
+                          title="Copy Full Address"
+                        >
+                          {copiedAddress ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                          )}
+                          <span>{copiedAddress ? 'Copied' : 'Copy'}</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            soundManager.playClick();
+                            disconnect();
+                          }}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-500/40 bg-rose-950/30 hover:bg-rose-900/50 text-xs text-rose-300 transition"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Disconnect</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Network & Balance Stats */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950">
+                        <div className="text-[10px] text-zinc-400 font-mono">ACTIVE NETWORK</div>
+                        <div className="text-xs font-bold text-amber-300 mt-0.5">
+                          {chainId === 80002
+                            ? 'Polygon Amoy'
+                            : chainId === 84532
+                            ? 'Base Sepolia'
+                            : `Chain #${chainId}`}
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950">
+                        <div className="text-[10px] text-zinc-400 font-mono">GOLD BALANCE</div>
+                        <div className="text-xs font-bold text-amber-400 mt-0.5 flex items-center gap-1 font-mono">
+                          <Coins className="w-3.5 h-3.5" />
+                          <span>{playerGold.toLocaleString()} GOLD</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950">
+                        <div className="text-[10px] text-zinc-400 font-mono">OWNED PARCELS</div>
+                        <div className="text-xs font-bold text-indigo-300 mt-0.5 flex items-center gap-1 font-mono">
+                          <Landmark className="w-3.5 h-3.5" />
+                          <span>{playerParcels.length} PLOTS</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Network Switcher */}
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-xs text-zinc-400">Switch Network:</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => switchChain?.({ chainId: 80002 })}
+                          className={`px-3 py-1 rounded-xl text-xs font-mono transition ${
+                            chainId === 80002
+                              ? 'bg-purple-600 text-white font-bold'
+                              : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                          }`}
+                        >
+                          Polygon Amoy (80002)
+                        </button>
+                        <button
+                          onClick={() => switchChain?.({ chainId: 84532 })}
+                          className={`px-3 py-1 rounded-xl text-xs font-mono transition ${
+                            chainId === 84532
+                              ? 'bg-blue-600 text-white font-bold'
+                              : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                          }`}
+                        >
+                          Base Sepolia (84532)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4 pt-2 border-t border-zinc-800">
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      You are currently exploring as an offline <strong>Mock Lord</strong>. You can freely walk around, talk to AI NPCs, view parcels, and simulate gameplay.
+                      To write real transactions to Polygon Amoy testnet, connect your browser wallet below:
+                    </p>
+
+                    <div className="flex flex-wrap gap-3">
+                      {connectors.map((connector) => (
+                        <button
+                          key={connector.id}
+                          onClick={() => {
+                            soundManager.playClick();
+                            connect({ connector });
+                          }}
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-amber-500/50 bg-gradient-to-r from-amber-600/90 to-amber-700/90 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold text-xs shadow-lg transition active:scale-95"
+                        >
+                          <Wallet className="w-4 h-4 text-stone-950" />
+                          <span>Connect with {connector.name}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-zinc-800/80 bg-zinc-950/60 text-[11px] text-zinc-400 space-y-1">
+                      <div className="font-semibold text-zinc-300">Supported Testnets:</div>
+                      <div>• <strong>Polygon Amoy</strong> (Chain ID: 80002) — Native currency: POL</div>
+                      <div>• <strong>Base Sepolia</strong> (Chain ID: 84532) — Native currency: Sepolia ETH</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 2: AI BRAIN & KEY VAULT                                               */}
           {/* ========================================================================= */}
           {activeTab === 'ai' && (
             <div className="space-y-6">
@@ -331,10 +587,9 @@ export function GameSettingsModal({
                     </span>
                   </div>
                   <p>
-                    Your API keys are encrypted and stored solely in your local browser{' '}
-                    <code className="text-amber-300 font-mono">localStorage</code>. They are never sent
-                    to any third-party server. All NPC dialogue generation (Sir Gareth, Farmer Aldric, Raymond Vance)
-                    and Citadel battle intelligence runs directly from your machine.
+                    Your API keys are stored strictly in your browser&apos;s local storage. They are never sent
+                    to any intermediary game server. All dynamic NPC responses (Sir Gareth, Aldric, Merin)
+                    are generated on-demand straight from your machine.
                   </p>
                 </div>
               </div>
@@ -458,7 +713,7 @@ export function GameSettingsModal({
                   </select>
                 </div>
 
-                {/* Local Ollama / Custom Endpoint URL */}
+                {/* Local Ollama Endpoint */}
                 {(selectedProvider === 'ollama' || selectedProvider === 'custom') && (
                   <div className="space-y-1.5">
                     <label className="text-xs text-zinc-400 block font-medium">
@@ -521,7 +776,7 @@ export function GameSettingsModal({
 
                 {saveSuccessNotice && (
                   <div className="p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-950/50 text-emerald-300 text-xs text-center font-medium">
-                    ✓ Configuration saved to local storage! AI Engine is now active.
+                    ✓ Configuration saved! AI Engine is now live and answering NPCs.
                   </div>
                 )}
               </div>
@@ -529,7 +784,176 @@ export function GameSettingsModal({
           )}
 
           {/* ========================================================================= */}
-          {/* TAB 2: CONTROLS & HOTKEYS                                                 */}
+          {/* TAB 3: DISPLAY & CLEAN SCREEN                                             */}
+          {/* ========================================================================= */}
+          {activeTab === 'display' && (
+            <div className="space-y-5">
+              <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40">
+                <h3 className="text-sm font-bold text-zinc-100 mb-1">Clean Screen & HUD Customization</h3>
+                <p className="text-xs text-zinc-400">
+                  Toggle on-screen HUD elements on and off to enjoy a completely cinematic medieval view.
+                </p>
+              </div>
+
+              {/* HUD Toggles */}
+              {hudSettings && (
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-xs text-zinc-200">Compass Heading Ribbon</div>
+                      <div className="text-[11px] text-zinc-400">Top-center compass ribbon showing cardinal directions and POIs</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        soundManager.playClick();
+                        hudSettings.setShowCompass(!hudSettings.showCompass);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                        hudSettings.showCompass
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                      }`}
+                    >
+                      {hudSettings.showCompass ? 'ENABLED' : 'HIDDEN'}
+                    </button>
+                  </div>
+
+                  {hudSettings.setShowQuestHUD && (
+                    <div className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
+                      <div>
+                        <div className="font-bold text-xs text-zinc-200">Quest Mission Log</div>
+                        <div className="text-[11px] text-zinc-400">Top-left mission directives and task checklist</div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          soundManager.playClick();
+                          hudSettings.setShowQuestHUD?.(!hudSettings.showQuestHUD);
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                          hudSettings.showQuestHUD
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                            : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                        }`}
+                      >
+                        {hudSettings.showQuestHUD ? 'ENABLED' : 'HIDDEN'}
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-xs text-zinc-200">GTA Radar Mini-Map</div>
+                      <div className="text-[11px] text-zinc-400">Bottom-left rotating circular compass and radar beacons</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        soundManager.playClick();
+                        hudSettings.setShowRadar(!hudSettings.showRadar);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                        hudSettings.showRadar
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                      }`}
+                    >
+                      {hudSettings.showRadar ? 'ENABLED' : 'HIDDEN'}
+                    </button>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-xs text-zinc-200">Atmospheric Vignette</div>
+                      <div className="text-[11px] text-zinc-400">Subtle edge shading across the viewport for immersion</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        soundManager.playClick();
+                        hudSettings.setShowPostProcessing(!hudSettings.showPostProcessing);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                        hudSettings.showPostProcessing
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                      }`}
+                    >
+                      {hudSettings.showPostProcessing ? 'ENABLED' : 'OFF'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Graphics Quality Preset */}
+              {setGraphicsQuality && (
+                <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-zinc-200">Graphics Rendering Preset</h4>
+                      <p className="text-[11px] text-zinc-400">Controls 3D draw distance and shadow quality</p>
+                    </div>
+                    <div className="flex items-center gap-1 bg-zinc-950 border border-zinc-800 rounded-xl p-1">
+                      {(['low', 'medium', 'high'] as const).map((lvl) => (
+                        <button
+                          key={lvl}
+                          onClick={() => {
+                            soundManager.playClick();
+                            setGraphicsQuality(lvl);
+                          }}
+                          className={`px-3 py-1 rounded-lg text-xs font-mono font-bold uppercase transition ${
+                            graphicsQuality === lvl
+                              ? 'bg-amber-500/20 border border-amber-400/60 text-amber-300 shadow'
+                              : 'text-zinc-400 hover:text-zinc-200'
+                          }`}
+                        >
+                          {lvl}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sound & Audio Volume */}
+              <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Volume2 className="w-4 h-4 text-amber-400" />
+                    <h4 className="text-xs font-bold text-zinc-200">Audio Volume Controls</h4>
+                  </div>
+                  <button
+                    onClick={() => soundManager.setSettings({ isMuted: !audioSettings.isMuted })}
+                    className="text-xs text-amber-400 hover:underline"
+                  >
+                    {audioSettings.isMuted ? 'Unmute All' : 'Mute All'}
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3 text-xs">
+                    <span className="w-24 text-zinc-300">Master Volume</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={audioSettings.isMuted ? 0 : audioSettings.masterVolume}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        soundManager.setSettings({ masterVolume: val, isMuted: false });
+                        soundManager.playVolumeFeedback(val);
+                      }}
+                      className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
+                    />
+                    <span className="w-10 text-right font-mono text-zinc-400">
+                      {audioSettings.isMuted ? '0%' : `${Math.round(audioSettings.masterVolume * 100)}%`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 4: CONTROLS & HOTKEYS                                                 */}
           {/* ========================================================================= */}
           {activeTab === 'controls' && (
             <div className="space-y-4">
@@ -553,12 +977,13 @@ export function GameSettingsModal({
                   { key: 'D / →', action: 'Strafe Right', desc: 'Steps laterally to the right' },
                   { key: 'Shift (Hold)', action: 'Sprint', desc: 'Increases locomotion speed to 8.5 m/s' },
                   { key: 'Space', action: 'Jump', desc: 'Applies Rapier physics vertical impulse' },
+                  { key: '[Esc] / [X]', action: 'Pause Menu', desc: 'Opens Escape pause screen & frees mouse cursor' },
                   { key: '[B]', action: 'Claim Land Parcel', desc: 'Stakes ownership over the current plot' },
                   { key: '[C]', action: 'Construction Mode', desc: 'Toggles 3D holographic structure placement' },
                   { key: '[R]', action: 'Rotate Hologram', desc: 'Rotates active structure preview 90 degrees' },
                   { key: '[E]', action: 'Interact / Talk / Harvest', desc: 'Talks with roaming NPCs or harvests gold tithes' },
                   { key: '[M]', action: 'Tactical War Map', desc: 'Opens aerial 3D kingdom balance map' },
-                  { key: '[Esc] / [K]', action: 'Settings Hub', desc: 'Opens this Master Settings & AI Vault modal' },
+                  { key: '[V]', action: 'Citadel Council', desc: 'Accesses realm decrees and voting' },
                 ].map((item) => (
                   <div
                     key={item.key}
@@ -578,7 +1003,7 @@ export function GameSettingsModal({
           )}
 
           {/* ========================================================================= */}
-          {/* TAB 3: KINGDOM & GOVERNANCE                                               */}
+          {/* TAB 5: KINGDOM & GOVERNANCE                                               */}
           {/* ========================================================================= */}
           {activeTab === 'kingdom' && (
             <div className="space-y-5">
@@ -660,83 +1085,17 @@ export function GameSettingsModal({
               </div>
             </div>
           )}
-
-          {/* ========================================================================= */}
-          {/* TAB 4: DISPLAY & CLEAN SCREEN                                             */}
-          {/* ========================================================================= */}
-          {activeTab === 'display' && (
-            <div className="space-y-4">
-              <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/40">
-                <h3 className="text-sm font-bold text-zinc-100 mb-1">Clean Screen & HUD Customization</h3>
-                <p className="text-xs text-zinc-400">
-                  Toggle on-screen HUD elements on and off to enjoy a completely cinematic medieval view.
-                </p>
-              </div>
-
-              {hudSettings && (
-                <div className="space-y-3">
-                  <div className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-xs text-zinc-200">GTA Radar Mini-Map</div>
-                      <div className="text-[11px] text-zinc-400">Shows bottom-left rotating compass and parcel beacons</div>
-                    </div>
-                    <button
-                      onClick={() => hudSettings.setShowRadar(!hudSettings.showRadar)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                        hudSettings.showRadar
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
-                      }`}
-                    >
-                      {hudSettings.showRadar ? 'ENABLED' : 'HIDDEN'}
-                    </button>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-xs text-zinc-200">Compass Heading Ribbon</div>
-                      <div className="text-[11px] text-zinc-400">Top-center compass ribbon showing cardinal directions</div>
-                    </div>
-                    <button
-                      onClick={() => hudSettings.setShowCompass(!hudSettings.showCompass)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                        hudSettings.showCompass
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
-                      }`}
-                    >
-                      {hudSettings.showCompass ? 'ENABLED' : 'HIDDEN'}
-                    </button>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-xs text-zinc-200">Cinematic Vignette</div>
-                      <div className="text-[11px] text-zinc-400">Subtle atmospheric edge shading across viewport</div>
-                    </div>
-                    <button
-                      onClick={() => hudSettings.setShowPostProcessing(!hudSettings.showPostProcessing)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                        hudSettings.showPostProcessing
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
-                      }`}
-                    >
-                      {hudSettings.showPostProcessing ? 'ENABLED' : 'OFF'}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* MODAL FOOTER */}
         <div className="px-6 py-3.5 border-t border-zinc-800/80 bg-zinc-900/40 flex items-center justify-between text-xs text-zinc-500">
-          <span>Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono">Esc</kbd> anytime to toggle this menu</span>
+          <span>Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono">Esc</kbd> anytime to return to the game</span>
           <button
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium transition"
+            onClick={() => {
+              soundManager.playClick();
+              onClose();
+            }}
+            className="px-4 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium transition cursor-pointer"
           >
             Close
           </button>

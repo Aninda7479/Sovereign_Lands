@@ -1,0 +1,126 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "SovereignLands-GLTF-Builder"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "HouseStone",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "HouseStone_node",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "HouseStone_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "HouseStone_mat",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.39215686274509803,
+          0.4549019607843137,
+          0.5450980392156862,
+          1
+        ],
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.8
+      }
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "max": [
+        6,
+        4.5,
+        5.5
+      ],
+      "min": [
+        -6,
+        -4.5,
+        -5.5
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR",
+      "max": [
+        23
+      ],
+      "min": [
+        0
+      ]
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 72,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 648,
+      "uri": "data:application/octet-stream;base64,AADAwAAAkMAAALBAAADAQAAAkMAAALBAAADAQAAAkEAAALBAAADAwAAAkEAAALBAAADAwAAAkMAAALDAAADAwAAAkEAAALDAAADAQAAAkEAAALDAAADAQAAAkMAAALDAAADAwAAAkEAAALDAAADAwAAAkEAAALBAAADAQAAAkEAAALBAAADAQAAAkEAAALDAAADAwAAAkMAAALDAAADAQAAAkMAAALDAAADAQAAAkMAAALBAAADAwAAAkMAAALBAAADAQAAAkMAAALDAAADAQAAAkEAAALDAAADAQAAAkEAAALBAAADAQAAAkMAAALBAAADAwAAAkMAAALDAAADAwAAAkMAAALBAAADAwAAAkEAAALBAAADAwAAAkEAAALDAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcA"
+    }
+  ]
+}
