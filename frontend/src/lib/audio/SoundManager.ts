@@ -165,6 +165,129 @@ class SoundManager {
       osc.stop(now + 0.25);
     } catch {}
   }
+
+  /**
+   * Crisp medieval gold coin clink (two high-resonance metallic strikes)
+   */
+  public playCoinClink() {
+    const ctx = this.initContext();
+    if (!ctx) return;
+    const vol = this.getEffectiveVolume('sfx') * 0.25;
+    if (vol <= 0) return;
+
+    try {
+      const now = ctx.currentTime;
+
+      // Strike 1
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(1864.66, now); // A#6
+      gain1.gain.setValueAtTime(vol * 0.8, now);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.15);
+
+      // Strike 2 (slight offset, higher chime)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(2489.02, now + 0.05); // D#7
+      gain2.gain.setValueAtTime(vol, now + 0.05);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.05);
+      osc2.stop(now + 0.23);
+    } catch {}
+  }
+
+  /**
+   * Medieval purchase / sale error buzzer (insufficient funds, locked level, invalid action)
+   */
+  public playErrorBuzzer() {
+    const ctx = this.initContext();
+    if (!ctx) return;
+    const vol = this.getEffectiveVolume('sfx') * 0.22;
+    if (vol <= 0) return;
+
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.setValueAtTime(110, now + 0.08);
+
+      gain.gain.setValueAtTime(vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    } catch {}
+  }
+
+  /**
+   * Heavy equipment latch / armor equip metallic clank
+   */
+  public playEquipSound() {
+    const ctx = this.initContext();
+    if (!ctx) return;
+    const vol = this.getEffectiveVolume('sfx') * 0.25;
+    if (vol <= 0) return;
+
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + 0.08);
+
+      gain.gain.setValueAtTime(vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+    } catch {}
+  }
+
+  /**
+   * Potion drink / draught consumption bubbling chime
+   */
+  public playPotionDrink() {
+    const ctx = this.initContext();
+    if (!ctx) return;
+    const vol = this.getEffectiveVolume('sfx') * 0.22;
+    if (vol <= 0) return;
+
+    try {
+      const now = ctx.currentTime;
+      const notes = [440, 554.37, 659.25, 880];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+
+        gain.gain.setValueAtTime(vol * 0.7, now + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.15);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.06);
+        osc.stop(now + idx * 0.06 + 0.16);
+      });
+    } catch {}
+  }
 }
 
 export const soundManager = new SoundManager();

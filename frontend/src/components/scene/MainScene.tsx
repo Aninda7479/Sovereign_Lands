@@ -22,19 +22,38 @@ import {
   NPCId,
 } from '../../../../ai-system/npc-engine/NPCProfiles';
 import { WorldSettlements } from '@/components/world/WorldSettlements';
+import { ShopWorldManager } from '@/components/world/shops/ShopWorldManager';
 import { WarTableEntity } from '@/components/tactical-map/WarTableEntity';
 import { ParcelEntity, snapToGrid, getTerrainHeight } from '@/lib/world/parcelCoordinates';
 import { StructureTypeEnum } from '@/lib/assets/modelRegistry';
 import { useGameState, GameStateContextType } from '@/providers/GameProvider';
 import { useParcelContract } from '@/hooks/web3/useParcelContract';
 import { useAccount } from 'wagmi';
+import { RemotePlayerEntity } from '@/components/character/RemotePlayerEntity';
+import { NetworkedRemotePlayer, ActiveSpeechBubble } from '@/hooks/useMultiplayerSync';
+
+export interface RemotePlayersListProps {
+  players?: NetworkedRemotePlayer[];
+  speechBubbles?: Record<string, ActiveSpeechBubble>;
+}
 
 /**
  * Real-Time Multiplayer Remote Players List
  * Safe container for remote player entities (Agent 17 replication)
  */
-export function RemotePlayersList() {
-  return <group name="RemotePlayersList" />;
+export function RemotePlayersList({ players = [], speechBubbles = {} }: RemotePlayersListProps) {
+  if (!players || players.length === 0) return null;
+  return (
+    <group name="RemotePlayersList">
+      {players.map((player) => (
+        <RemotePlayerEntity
+          key={`remote_player_${player.id}`}
+          player={player}
+          speechBubble={speechBubbles[player.id]}
+        />
+      ))}
+    </group>
+  );
 }
 
 export interface NPCWorldEntityWrapperProps {
@@ -87,6 +106,7 @@ export interface MainSceneProps {
   onParcelAction?: (action: 'interact' | 'build' | 'buy') => void;
   onOpenWarTable?: () => void;
   onInteractNPC?: (npcId: string) => void;
+  onOpenShop?: (shopId: string) => void;
   activeNpcDialogue?: string | null;
   timeOfDay?: 'day' | 'sunset' | 'night';
   showLighting?: boolean;
@@ -98,6 +118,8 @@ export interface MainSceneProps {
   playerFaction?: 'north' | 'south' | 'neutral';
   isPointerLockDisabled?: boolean;
   graphicsQuality?: 'low' | 'medium' | 'high';
+  remotePlayers?: NetworkedRemotePlayer[];
+  speechBubbles?: Record<string, ActiveSpeechBubble>;
 }
 
 /**
@@ -118,6 +140,7 @@ export function MainScene({
   onParcelAction,
   onOpenWarTable,
   onInteractNPC,
+  onOpenShop,
   activeNpcDialogue,
   timeOfDay: propTimeOfDay,
   showLighting = true,
@@ -129,6 +152,8 @@ export function MainScene({
   playerFaction = 'north',
   isPointerLockDisabled = false,
   graphicsQuality = 'medium',
+  remotePlayers = [],
+  speechBubbles = {},
 }: MainSceneProps) {
   // Attempt to read GameProvider context (gracefully fallback if rendered standalone)
   let gameState: Partial<GameStateContextType> = {};
@@ -161,15 +186,15 @@ export function MainScene({
   const effectiveIsBuildingMode = propIsBuildingMode ?? gameState.isBuildingMode ?? false;
   const effectiveActiveNpc = activeNpcDialogue ?? gameState.activeNpcDialogue ?? null;
 
-  // Local state tracking for player position
-  const [localPlayerPosition, setLocalPlayerPosition] = useState<[number, number, number]>(
+  // Local ref tracking for player position to decouple scene re-renders from player locomotion
+  const localPlayerPosRef = React.useRef<[number, number, number]>(
     propPlayerPosition ?? initialPlayerPosition
   );
-  const playerPosition: [number, number, number] = propPlayerPosition ?? localPlayerPosition;
+  const playerPosition: [number, number, number] = propPlayerPosition ?? localPlayerPosRef.current;
 
   const handlePositionChange = useCallback(
     (newPos: [number, number, number]) => {
-      setLocalPlayerPosition(newPos);
+      localPlayerPosRef.current = newPos;
       onPlayerPositionChange?.(newPos);
       if (gameState.setPlayerPosition) {
         gameState.setPlayerPosition(newPos);
@@ -203,6 +228,17 @@ export function MainScene({
       gameState.setActiveModal('tactical');
     }
   }, [onOpenWarTable, gameState]);
+
+  const handleOpenShop = useCallback(
+    (shopId: string) => {
+      if (onOpenShop) {
+        onOpenShop(shopId);
+      } else {
+        window.dispatchEvent(new CustomEvent('sovereign-open-shop', { detail: { shopId } }));
+      }
+    },
+    [onOpenShop]
+  );
 
   // Compute building hologram position in front of player
   const buildPosition = useMemo<[number, number, number]>(() => {
@@ -264,10 +300,16 @@ export function MainScene({
         />
 
         {/* Real-Time Multiplayer Remote Players */}
-        <RemotePlayersList />
+        <RemotePlayersList players={remotePlayers} speechBubbles={speechBubbles} />
 
         {/* Living Medieval Settlements, Houses, Central Park, Fountains & Mountain Ranges */}
         <WorldSettlements />
+
+        {/* 6 Continental Open-World Shops & Merchant Establishments */}
+        <ShopWorldManager
+          playerPosition={playerPosition}
+          onOpenShop={handleOpenShop}
+        />
 
         {/* Roaming Living AI NPCs */}
         {getAllNPCProfiles().map((profile) => (

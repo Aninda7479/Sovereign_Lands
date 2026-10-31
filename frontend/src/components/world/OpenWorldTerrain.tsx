@@ -144,6 +144,94 @@ export function OpenWorldTerrain({
     });
   }, []);
 
+  // Instanced procedural grass tufts distributed across northern & southern fields
+  const grassMesh = useMemo(() => {
+    // 2-plane crossed blade geometry for natural volume
+    const bladeW = 0.45;
+    const bladeH = 0.55;
+    const g1 = new THREE.PlaneGeometry(bladeW, bladeH);
+    g1.translate(0, bladeH / 2, 0);
+    const g2 = g1.clone();
+    g2.rotateY(Math.PI / 2);
+
+    const pos1 = g1.attributes.position.array;
+    const pos2 = g2.attributes.position.array;
+    const combinedPositions = new Float32Array(pos1.length + pos2.length);
+    combinedPositions.set(pos1, 0);
+    combinedPositions.set(pos2, pos1.length);
+
+    const grassGeo = new THREE.BufferGeometry();
+    grassGeo.setAttribute('position', new THREE.BufferAttribute(combinedPositions, 3));
+
+    const idx1 = g1.index?.array || [];
+    const idx2 = g2.index?.array || [];
+    const combinedIndices = new Uint32Array(idx1.length + idx2.length);
+    combinedIndices.set(idx1, 0);
+    for (let i = 0; i < idx2.length; i++) {
+      combinedIndices[idx1.length + i] = idx2[i] + 4;
+    }
+    grassGeo.setIndex(new THREE.BufferAttribute(combinedIndices, 1));
+    grassGeo.computeVertexNormals();
+
+    const grassMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.85,
+      metalness: 0.05,
+      side: THREE.DoubleSide,
+      flatShading: true,
+    });
+
+    const GRASS_COUNT = 1800;
+    const mesh = new THREE.InstancedMesh(grassGeo, grassMat, GRASS_COUNT);
+
+    let seed = 777;
+    const random = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+
+    const dummy = new THREE.Object3D();
+    const northBorealGrass = new THREE.Color('#224233');
+    const northFrostMoss = new THREE.Color('#385e49');
+    const southLushGrass = new THREE.Color('#558b2f');
+    const southGoldenWheat = new THREE.Color('#ca8a04');
+    const tempColor = new THREE.Color();
+
+    let placed = 0;
+    for (let i = 0; i < GRASS_COUNT * 2 && placed < GRASS_COUNT; i++) {
+      const x = -360 + random() * 720;
+      const z = -360 + random() * 720;
+
+      // Skip the Great Divide river channel and bridge highway
+      if (Math.abs(z) <= 24 || (Math.abs(x) <= 12 && Math.abs(z) <= 30)) {
+        continue;
+      }
+
+      const y = getTerrainHeight(x, z);
+      dummy.position.set(x, y - 0.04, z);
+      dummy.rotation.y = random() * Math.PI;
+      const s = 0.75 + random() * 0.55;
+      dummy.scale.set(s, s * (0.8 + random() * 0.4), s);
+      dummy.updateMatrix();
+
+      mesh.setMatrixAt(placed, dummy.matrix);
+
+      if (z < -24) {
+        tempColor.lerpColors(northBorealGrass, northFrostMoss, random());
+      } else {
+        tempColor.lerpColors(southLushGrass, southGoldenWheat, random() * 0.4);
+      }
+      mesh.setColorAt(placed, tempColor);
+      placed++;
+    }
+
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    mesh.receiveShadow = true;
+
+    return mesh;
+  }, []);
+
   return (
     <group name="OpenWorldTerrain_Root">
       {/* Physics Surface with Rapier Trimesh Collider */}
@@ -158,6 +246,9 @@ export function OpenWorldTerrain({
           />
         </mesh>
       </RigidBody>
+
+      {/* Lush Instanced Grass Tufts */}
+      <primitive object={grassMesh} />
 
       {/* Decorative Environmental Foliage */}
       <group name="TerrainFoliage">

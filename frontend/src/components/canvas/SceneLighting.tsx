@@ -33,8 +33,8 @@ export function SceneLighting({
       hemiGround: '#451a03',
       hemiIntensity: 0.5,
       fogColor: '#93c5fd',
-      fogNear: 150,
-      fogFar: 600,
+      fogNear: 250,
+      fogFar: 3500,
     },
     sunset: {
       sunColor: '#fdba74',
@@ -46,8 +46,8 @@ export function SceneLighting({
       hemiGround: '#292524',
       hemiIntensity: 0.4,
       fogColor: '#f97316',
-      fogNear: 100,
-      fogFar: 450,
+      fogNear: 200,
+      fogFar: 3000,
     },
     night: {
       sunColor: '#93c5fd',
@@ -59,8 +59,8 @@ export function SceneLighting({
       hemiGround: '#020617',
       hemiIntensity: 0.2,
       fogColor: '#020617',
-      fogNear: 80,
-      fogFar: 350,
+      fogNear: 150,
+      fogFar: 2500,
     },
   }[timeOfDay];
 

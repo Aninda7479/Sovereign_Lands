@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { getTerrainHeight } from '@/lib/world/parcelCoordinates';
 
 export interface ThirdPersonCameraProps {
-  targetPosition: THREE.Vector3;
+  targetPosition: THREE.Vector3 | React.MutableRefObject<THREE.Vector3>;
   isSprinting?: boolean;
   defaultDistance?: number;
   minDistance?: number;
@@ -144,7 +144,11 @@ export function ThirdPersonCamera({
   // Frame Update Loop: Camera Position, Smoothing, Collision Raycast, and Dynamic FOV
   useFrame((_, delta) => {
     // Player target focus point (upper torso / head at Y = 1.4)
-    const focusPoint = targetPosition.clone().add(new THREE.Vector3(0, 1.4, 0));
+    const targetPos: THREE.Vector3 =
+      'current' in targetPosition
+        ? targetPosition.current
+        : targetPosition;
+    const focusPoint = targetPos.clone().add(new THREE.Vector3(0, 1.4, 0));
 
     // Dynamic FOV shift during sprint (60 -> 70 deg)
     if (camera instanceof THREE.PerspectiveCamera) {

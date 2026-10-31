@@ -1,0 +1,391 @@
+import { InventoryItem } from './types';
+
+export const MASTER_ITEMS_CATALOG: Record<string, InventoryItem> = {
+  // === ARTEFACTS & RELICS ===
+  crown_of_high_command: {
+    id: 'crown_of_high_command',
+    name: 'Crown of High Command',
+    category: 'artefacts',
+    rarity: 'legendary',
+    slot: 'head',
+    price: 450,
+    levelReq: 6,
+    description:
+      'Forged in the molten vaults of the First Citadel. Grants royal command over market prices, speeds sovereign footsteps, and bolsters fortress defense.',
+    stats: {
+      shopDiscountPct: 20,
+      harvestYieldPct: 35,
+      defenseRating: 30,
+    },
+    statTags: ['+20% Shop Discount', '+35% Parcel Gold Yield', '+30 Defense Rating'],
+    iconName: 'Crown',
+    quantity: 1,
+  },
+  pennant_of_sovereignty: {
+    id: 'pennant_of_sovereignty',
+    name: 'Pennant of Sovereign Realm',
+    category: 'artefacts',
+    rarity: 'legendary',
+    slot: 'relic',
+    price: 520,
+    levelReq: 7,
+    description:
+      'The sacred golden battle standard flown during the founding wars. Radiates an unyielding aura that quickens runners and multiplies parcel yields.',
+    stats: {
+      movementSpeedPct: 40,
+      harvestYieldPct: 50,
+      shopDiscountPct: 15,
+    },
+    statTags: ['+40% Sprint Speed', '+50% Parcel Gold Yield', '+15% Shop Discount'],
+    iconName: 'Flag',
+    quantity: 1,
+  },
+  talisman_of_abundant_tithes: {
+    id: 'talisman_of_abundant_tithes',
+    name: 'Talisman of Abundant Tithes',
+    category: 'artefacts',
+    rarity: 'epic',
+    slot: 'amulet',
+    price: 280,
+    levelReq: 4,
+    description:
+      'Blessed with sacred runes of harvest. Pulls latent gold veins to the surface of every owned parcel.',
+    stats: {
+      harvestYieldPct: 45,
+      defenseRating: 15,
+    },
+    statTags: ['+45% Parcel Gold Yield', '+15 Defense Rating'],
+    iconName: 'Sparkles',
+    quantity: 1,
+  },
+  boots_of_the_windstrider: {
+    id: 'boots_of_the_windstrider',
+    name: 'Relic of the Windstrider',
+    category: 'artefacts',
+    rarity: 'epic',
+    slot: 'relic',
+    price: 320,
+    levelReq: 3,
+    description:
+      'Unearthed from the Great Divide gale canyon. Imbues the bearer with the effortless velocity of northern blizzards.',
+    stats: {
+      movementSpeedPct: 35,
+      defenseRating: 10,
+    },
+    statTags: ['+35% Sprint Speed', '+10 Defense Rating'],
+    iconName: 'Wind',
+    quantity: 1,
+  },
+  ring_of_the_shadow_broker: {
+    id: 'ring_of_the_shadow_broker',
+    name: 'Signet of the Shadow Broker',
+    category: 'artefacts',
+    rarity: 'epic',
+    slot: 'ring',
+    price: 290,
+    levelReq: 4,
+    description:
+      'A signet favored by nomadic dealers and caravan masterminds. Intimidates regional peddlers into offering hefty discounts.',
+    stats: {
+      shopDiscountPct: 25,
+      movementSpeedPct: 15,
+    },
+    statTags: ['+25% Shop Discount', '+15% Sprint Speed'],
+    iconName: 'Gem',
+    quantity: 1,
+  },
+  hunter_bone_amulet: {
+    id: 'hunter_bone_amulet',
+    name: 'Hunter Wolf-Tooth Amulet',
+    category: 'artefacts',
+    rarity: 'uncommon',
+    slot: 'amulet',
+    price: 85,
+    levelReq: 2,
+    description:
+      'Carved from the fangs of a northern direwolf. Helps scouts traverse rough tundra terrain with agility.',
+    stats: {
+      movementSpeedPct: 12,
+      harvestYieldPct: 15,
+    },
+    statTags: ['+12% Sprint Speed', '+15% Parcel Gold Yield'],
+    iconName: 'ShieldAlert',
+    quantity: 1,
+  },
+  signet_of_the_citadel_consul: {
+    id: 'signet_of_the_citadel_consul',
+    name: 'Citadel Consul Ring',
+    category: 'artefacts',
+    rarity: 'rare',
+    slot: 'ring',
+    price: 195,
+    levelReq: 3,
+    description:
+      'Bearing the twin eagles of the High Citadel. Gives authority over trade tariffs and border tithes.',
+    stats: {
+      shopDiscountPct: 15,
+      harvestYieldPct: 20,
+    },
+    statTags: ['+15% Shop Discount', '+20% Parcel Gold Yield'],
+    iconName: 'CircleDot',
+    quantity: 1,
+  },
+
+  // === WEAPONS & ARMOR ===
+  boreal_frostfang_blade: {
+    id: 'boreal_frostfang_blade',
+    name: 'Boreal Frostfang Greatsword',
+    category: 'weapons',
+    rarity: 'legendary',
+    slot: 'weapon',
+    price: 440,
+    levelReq: 6,
+    description:
+      'A massive blade folded sixty times by Torvald and quenched in glacial waters. Sheathed in biting permafrost.',
+    stats: {
+      defenseRating: 50,
+      movementSpeedPct: 20,
+    },
+    statTags: ['+50 Defense Rating', '+20% Sprint Speed'],
+    iconName: 'Sword',
+    quantity: 1,
+  },
+  aegis_of_the_frost_bastion: {
+    id: 'aegis_of_the_frost_bastion',
+    name: 'Aegis of the Frost Bastion',
+    category: 'weapons',
+    rarity: 'epic',
+    slot: 'shield',
+    price: 360,
+    levelReq: 5,
+    description:
+      'Tower kite shield forged with star-iron plates. Capable of repelling catapult shrapnel and heavy arrows.',
+    stats: {
+      defenseRating: 65,
+      harvestYieldPct: 15,
+    },
+    statTags: ['+65 Defense Rating', '+15% Parcel Gold Yield'],
+    iconName: 'Shield',
+    quantity: 1,
+  },
+  helm_of_the_vanguard: {
+    id: 'helm_of_the_vanguard',
+    name: 'Visored Vanguard Helm',
+    category: 'weapons',
+    rarity: 'rare',
+    slot: 'head',
+    price: 180,
+    levelReq: 3,
+    description:
+      'Hardened steel sallet helm worn by Sir Gareth’s elite border sentinels.',
+    stats: {
+      defenseRating: 35,
+      movementSpeedPct: 10,
+    },
+    statTags: ['+35 Defense Rating', '+10% Sprint Speed'],
+    iconName: 'HardHat',
+    quantity: 1,
+  },
+  iron_broadsword: {
+    id: 'iron_broadsword',
+    name: 'Standard Iron Broadsword',
+    category: 'weapons',
+    rarity: 'common',
+    slot: 'weapon',
+    price: 65,
+    levelReq: 1,
+    description:
+      'Well-balanced Northern infantry sword. Sharp, durable, and reliable on the open frontier.',
+    stats: {
+      defenseRating: 15,
+      movementSpeedPct: 5,
+    },
+    statTags: ['+15 Defense Rating', '+5% Sprint Speed'],
+    iconName: 'Sword',
+    quantity: 1,
+  },
+  wooden_kite_shield: {
+    id: 'wooden_kite_shield',
+    name: 'Reinforced Pine Kite Shield',
+    category: 'weapons',
+    rarity: 'common',
+    slot: 'shield',
+    price: 45,
+    levelReq: 1,
+    description:
+      'Solid pine planks bound by hand-riveted iron trim. Decent protection for new settlers.',
+    stats: {
+      defenseRating: 20,
+    },
+    statTags: ['+20 Defense Rating'],
+    iconName: 'Shield',
+    quantity: 1,
+  },
+
+  // === POTIONS & ELIXIRS ===
+  elixir_of_hyper_swiftness: {
+    id: 'elixir_of_hyper_swiftness',
+    name: 'Elixir of Hyper Swiftness',
+    category: 'potions',
+    rarity: 'rare',
+    price: 45,
+    levelReq: 1,
+    usable: true,
+    buffDurationSec: 60,
+    buffName: 'Gale Surge',
+    buffDescription: '+40% Sprint Speed for 60 seconds',
+    description:
+      'Distilled by Sister Beatrice from mountain quicksilver lilies. Grants explosive footwork across the sandbox.',
+    stats: {
+      movementSpeedPct: 40,
+    },
+    statTags: ['+40% Sprint Speed (60s Buff)', 'Consumable'],
+    iconName: 'Zap',
+    quantity: 1,
+  },
+  draught_of_boreal_abundance: {
+    id: 'draught_of_boreal_abundance',
+    name: 'Draught of Boreal Abundance',
+    category: 'potions',
+    rarity: 'uncommon',
+    price: 55,
+    levelReq: 1,
+    usable: true,
+    buffDurationSec: 120,
+    buffName: 'Golden Bloom',
+    buffDescription: '+50% Parcel Gold Yield for 120 seconds',
+    description:
+      'Infused with fermented honey, clover, and spring sap. Maximizes parcel tax collectors and crop harvests.',
+    stats: {
+      harvestYieldPct: 50,
+    },
+    statTags: ['+50% Parcel Gold Yield (120s Buff)', 'Consumable'],
+    iconName: 'Coins',
+    quantity: 1,
+  },
+  potion_of_iron_skin: {
+    id: 'potion_of_iron_skin',
+    name: 'Tincture of Iron Skin',
+    category: 'potions',
+    rarity: 'uncommon',
+    price: 40,
+    levelReq: 1,
+    usable: true,
+    buffDurationSec: 90,
+    buffName: 'Stonebark Aegis',
+    buffDescription: '+45 Defense Rating for 90 seconds',
+    description:
+      'A viscous grey potion that temporarily petrifies epidermal tissue, nullifying environmental blows.',
+    stats: {
+      defenseRating: 45,
+    },
+    statTags: ['+45 Defense Rating (90s Buff)', 'Consumable'],
+    iconName: 'ShieldCheck',
+    quantity: 1,
+  },
+  draught_of_the_merchant_prince: {
+    id: 'draught_of_the_merchant_prince',
+    name: 'Draught of the Merchant Prince',
+    category: 'potions',
+    rarity: 'rare',
+    price: 75,
+    levelReq: 2,
+    usable: true,
+    buffDurationSec: 180,
+    buffName: 'Silver Tongue',
+    buffDescription: '+20% Shop Discount across all merchants for 180 seconds',
+    description:
+      'Gives the drinker silver-tongued eloquence, unlocking the best prices in town for three minutes.',
+    stats: {
+      shopDiscountPct: 20,
+    },
+    statTags: ['+20% Shop Discount (180s Buff)', 'Consumable'],
+    iconName: 'Sparkles',
+    quantity: 1,
+  },
+
+  // === BLUEPRINTS ===
+  blueprint_citadel_grand_keep: {
+    id: 'blueprint_citadel_grand_keep',
+    name: 'Blueprint: Citadel Grand Keep',
+    category: 'blueprints',
+    rarity: 'legendary',
+    price: 680,
+    levelReq: 8,
+    description:
+      'Master architectural schematics for erecting an impenetrable fortress keep with crenelated towers and treasury vault.',
+    stats: {
+      harvestYieldPct: 60,
+      defenseRating: 50,
+    },
+    statTags: ['Unlocks Grand Keep Tier IV', '+60% Parcel Gold Yield', '+50 Defense'],
+    iconName: 'Landmark',
+    quantity: 1,
+  },
+  blueprint_reinforced_watchtower: {
+    id: 'blueprint_reinforced_watchtower',
+    name: 'Blueprint: Ballista Watchtower',
+    category: 'blueprints',
+    rarity: 'rare',
+    price: 240,
+    levelReq: 3,
+    description:
+      'Detailed drafting for tall timber towers mounted with twin heavy spring-loaded ballistas.',
+    stats: {
+      defenseRating: 40,
+    },
+    statTags: ['Unlocks Ballista Tower', '+40 Defense Rating'],
+    iconName: 'Castle',
+    quantity: 1,
+  },
+  blueprint_automated_granary: {
+    id: 'blueprint_automated_granary',
+    name: 'Blueprint: Automated Granary',
+    category: 'blueprints',
+    rarity: 'epic',
+    price: 390,
+    levelReq: 4,
+    description:
+      'Hydraulic-wheel driven elevators that triple grain sorting throughput across farmland.',
+    stats: {
+      harvestYieldPct: 45,
+    },
+    statTags: ['Unlocks Automated Silo', '+45% Parcel Gold Yield'],
+    iconName: 'Warehouse',
+    quantity: 1,
+  },
+  blueprint_blacksmith_foundry: {
+    id: 'blueprint_blacksmith_foundry',
+    name: 'Blueprint: Royal Foundry',
+    category: 'blueprints',
+    rarity: 'epic',
+    price: 350,
+    levelReq: 5,
+    description:
+      'Industrial blast furnace design enabling advanced parcel fortifications and military gear fabrication.',
+    stats: {
+      defenseRating: 35,
+      shopDiscountPct: 10,
+    },
+    statTags: ['Unlocks Royal Foundry', '+35 Defense', '+10% Shop Discount'],
+    iconName: 'Flame',
+    quantity: 1,
+  },
+};
+
+export const INITIAL_PLAYER_EQUIPMENT = {
+  head: null,
+  amulet: MASTER_ITEMS_CATALOG['hunter_bone_amulet'],
+  ring: null,
+  weapon: MASTER_ITEMS_CATALOG['iron_broadsword'],
+  shield: MASTER_ITEMS_CATALOG['wooden_kite_shield'],
+  relic: null,
+};
+
+export const INITIAL_PLAYER_INVENTORY: InventoryItem[] = [
+  { ...MASTER_ITEMS_CATALOG['elixir_of_hyper_swiftness'], quantity: 3 },
+  { ...MASTER_ITEMS_CATALOG['draught_of_boreal_abundance'], quantity: 2 },
+  { ...MASTER_ITEMS_CATALOG['potion_of_iron_skin'], quantity: 1 },
+  { ...MASTER_ITEMS_CATALOG['blueprint_reinforced_watchtower'], quantity: 1 },
+  { ...MASTER_ITEMS_CATALOG['boots_of_the_windstrider'], quantity: 1 },
+];

@@ -6,9 +6,9 @@ import * as THREE from 'three';
  */
 
 export const PHYSICS_CONFIG = {
-  // Movement Speeds (m/s)
-  walkSpeed: 5.2,
-  sprintSpeed: 9.36, // 1.8x walk speed
+  // Movement Speeds (m/s) - calibrated for realistic kingdom scale and journey time
+  walkSpeed: 3.8,
+  sprintSpeed: 7.2, // ~1.9x walk speed
   backwardSpeedMultiplier: 0.7,
   strafeSpeedMultiplier: 0.85,
 

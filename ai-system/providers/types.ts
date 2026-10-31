@@ -3,7 +3,7 @@
  * Unifies client-side LLM adapters for OpenAI, Google Gemini, Anthropic Claude, and local Ollama.
  */
 
-export type AIProviderType = 'openai' | 'gemini' | 'anthropic' | 'ollama' | 'custom' | 'mock';
+export type AIProviderType = 'opencode' | 'openai' | 'gemini' | 'anthropic' | 'ollama' | 'custom' | 'mock';
 
 export interface DialogueMessage {
   role: 'player' | 'npc' | 'system';
@@ -70,6 +70,21 @@ export interface NPCSpatialContext {
   weather?: string;
 }
 
+export type StreamCallback = (chunk: string, fullText: string) => void;
+
+export type NPCGestureType =
+  | 'idle'
+  | 'conversing'
+  | 'thinking'
+  | 'bowing'
+  | 'saluting'
+  | 'waving'
+  | 'shrugging'
+  | 'laughing'
+  | 'gesturing'
+  | 'inspecting'
+  | 'warming_hands';
+
 /**
  * Unified AI Adapter Interface
  * All LLM client adapters must implement this contract.
@@ -77,6 +92,10 @@ export interface NPCSpatialContext {
 export interface AIAdapter {
   provider: AIProviderType | string;
   generateNPCResponse(context: NPCConversationContext): Promise<string>;
+  generateNPCResponseStream?(
+    context: NPCConversationContext,
+    onToken: StreamCallback
+  ): Promise<string>;
   generateNPCRoutineAction(context: NPCSpatialContext): Promise<NPCSpatialAction>;
 }
 

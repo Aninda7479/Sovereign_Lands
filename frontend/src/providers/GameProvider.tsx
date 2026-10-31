@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiConfig } from '@/lib/web3/wagmiConfig';
+import { PlayerProgressionProvider } from './PlayerProgressionProvider';
 
 export type ActiveModalType = 'none' | 'council' | 'tactical' | 'aiSettings' | 'build';
 
@@ -88,7 +89,7 @@ export function GameProvider({ children }: GameProviderProps) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <GameStateContext.Provider value={gameStateValue}>
-          {children}
+          <PlayerProgressionProvider>{children}</PlayerProgressionProvider>
         </GameStateContext.Provider>
       </QueryClientProvider>
     </WagmiProvider>

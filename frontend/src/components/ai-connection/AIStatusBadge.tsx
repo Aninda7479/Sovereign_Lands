@@ -99,6 +99,8 @@ export function AIStatusBadge({
 
   const getProviderLabel = (prov: AIProviderType): string => {
     switch (prov) {
+      case 'opencode':
+        return 'OpenCode Free';
       case 'gemini':
         return 'Gemini 2.0';
       case 'openai':
@@ -123,6 +125,10 @@ export function AIStatusBadge({
           <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
         </span>
       );
+    }
+
+    if (activeProvider === 'opencode') {
+      return <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />;
     }
 
     if (activeProvider === 'mock') {

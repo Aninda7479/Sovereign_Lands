@@ -2,13 +2,14 @@
 
 import React from 'react';
 
-export type PromptActionType = 'buy' | 'harvest' | 'council' | 'build' | 'npc';
+export type PromptActionType = 'buy' | 'harvest' | 'council' | 'build' | 'npc' | 'shop';
 
 export interface InteractionPromptProps {
   actionType: PromptActionType | null;
   parcelId?: number;
   npcName?: string;
   npcRole?: string;
+  shopName?: string;
   goldReward?: number;
   priceEth?: string;
   onTrigger?: () => void;
@@ -19,6 +20,8 @@ export interface InteractionPromptProps {
  * Dynamically switches between:
  * - [B] Claim Parcel — 0.01 ETH
  * - [E] Harvest Gold (+X Gold Ready)
+ * - [E] Trade Wares & Artefacts
+ * - [E] Speak with Resident / NPC
  * - [V] Open Kingdom Council & Vote
  * - [C] Open In-World Building Mode
  */
@@ -27,6 +30,7 @@ export function InteractionPrompt({
   parcelId,
   npcName,
   npcRole,
+  shopName,
   goldReward = 25,
   priceEth = '0.01',
   onTrigger,
@@ -40,6 +44,13 @@ export function InteractionPrompt({
       subtitle: npcRole || 'Press E or Click to interact',
       color: 'border-amber-400/90 bg-zinc-950/90 text-amber-200',
       badge: 'bg-amber-500/30 text-amber-300 border-amber-400/80',
+    },
+    shop: {
+      key: 'E',
+      title: shopName ? `Enter ${shopName}` : npcName ? `Trade with ${npcName}` : 'Trade Wares & Artefacts',
+      subtitle: npcRole || 'Press [E] to browse shop catalog',
+      color: 'border-amber-400/90 bg-zinc-950/90 text-amber-200',
+      badge: 'bg-gradient-to-r from-amber-500/30 to-yellow-500/30 text-amber-300 border-amber-400/80',
     },
     buy: {
       key: 'B',
@@ -102,5 +113,3 @@ export function InteractionPrompt({
     </div>
   );
 }
-
-export default InteractionPrompt;

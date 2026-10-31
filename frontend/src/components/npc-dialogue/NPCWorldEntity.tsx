@@ -137,15 +137,86 @@ export function NPCWorldEntity({
       animTime.current += delta * 2.5;
       const t = animTime.current;
 
-      // Subtle talking hand gestures and head nodding
-      head.rotation.x = Math.sin(t * 2) * 0.06;
-      head.rotation.y = Math.sin(t) * 0.04;
-      rightArm.rotation.x = -0.3 + Math.sin(t * 1.5) * 0.15;
-      leftArm.rotation.x = -0.2 + Math.cos(t * 1.2) * 0.1;
+      // Natural conversational gesturing & head nodding
+      head.rotation.x = Math.sin(t * 2.2) * 0.07;
+      head.rotation.y = Math.sin(t * 0.8) * 0.08;
+      rightArm.rotation.x = -0.35 + Math.sin(t * 1.8) * 0.22;
+      rightArm.rotation.z = 0.1 + Math.cos(t * 1.4) * 0.1;
+      leftArm.rotation.x = -0.2 + Math.cos(t * 1.3) * 0.15;
+      leftArm.rotation.z = -0.1;
 
       leftLeg.rotation.x = 0;
       rightLeg.rotation.x = 0;
-      torso.position.y = 0.9 + Math.sin(t * 0.8) * 0.01;
+      torso.position.y = 0.9 + Math.sin(t * 0.8) * 0.015;
+      torso.rotation.x = 0.04;
+    } else if (state === 'bowing') {
+      animTime.current += delta * 2.0;
+      const t = animTime.current;
+
+      // Respectful medieval bow
+      torso.rotation.x = THREE.MathUtils.lerp(torso.rotation.x, 0.38 + Math.sin(t) * 0.02, 0.15);
+      head.rotation.x = THREE.MathUtils.lerp(head.rotation.x, 0.25, 0.15);
+      rightArm.rotation.x = THREE.MathUtils.lerp(rightArm.rotation.x, -0.6, 0.15);
+      rightArm.rotation.z = THREE.MathUtils.lerp(rightArm.rotation.z, -0.35, 0.15); // Across chest
+      leftArm.rotation.x = THREE.MathUtils.lerp(leftArm.rotation.x, 0.1, 0.15);
+      leftArm.rotation.z = THREE.MathUtils.lerp(leftArm.rotation.z, -0.05, 0.15);
+      torso.position.y = THREE.MathUtils.lerp(torso.position.y, 0.86, 0.15);
+    } else if (state === 'saluting') {
+      // Knightly proud salute
+      torso.rotation.x = -0.04;
+      torso.position.y = 0.91;
+      head.rotation.x = -0.05;
+      rightArm.rotation.x = THREE.MathUtils.lerp(rightArm.rotation.x, -1.3, 0.2);
+      rightArm.rotation.z = THREE.MathUtils.lerp(rightArm.rotation.z, -0.4, 0.2); // Hand to brow/crest
+      leftArm.rotation.x = THREE.MathUtils.lerp(leftArm.rotation.x, -0.1, 0.15);
+      leftArm.rotation.z = -0.1;
+    } else if (state === 'waving') {
+      animTime.current += delta * 4.5;
+      const t = animTime.current;
+      // Friendly greeting hand wave
+      torso.rotation.x = 0;
+      head.rotation.x = -0.05;
+      head.rotation.y = 0.05;
+      rightArm.rotation.x = THREE.MathUtils.lerp(rightArm.rotation.x, -1.6, 0.2);
+      rightArm.rotation.z = -0.25 + Math.sin(t) * 0.35; // Rhythmic wave
+      leftArm.rotation.x = THREE.MathUtils.lerp(leftArm.rotation.x, 0, 0.15);
+    } else if (state === 'thinking') {
+      animTime.current += delta * 1.5;
+      const t = animTime.current;
+      // Pondering: hand to chin, head tilted
+      torso.rotation.x = 0.05;
+      head.rotation.z = 0.12;
+      head.rotation.x = 0.15 + Math.sin(t) * 0.03;
+      rightArm.rotation.x = THREE.MathUtils.lerp(rightArm.rotation.x, -1.1, 0.2);
+      rightArm.rotation.z = THREE.MathUtils.lerp(rightArm.rotation.z, -0.25, 0.2); // Chin touch
+      leftArm.rotation.x = THREE.MathUtils.lerp(leftArm.rotation.x, -0.3, 0.15);
+      leftArm.rotation.z = 0.15; // Supporting elbow
+    } else if (state === 'shrugging') {
+      // Both palms out, shoulders raised
+      torso.position.y = 0.92;
+      head.rotation.z = 0.1;
+      rightArm.rotation.x = -0.35;
+      rightArm.rotation.z = -0.45;
+      leftArm.rotation.x = -0.35;
+      leftArm.rotation.z = 0.45;
+    } else if (state === 'laughing') {
+      animTime.current += delta * 6.0;
+      const t = animTime.current;
+      // Hearty laughter: torso bobbing, head thrown back
+      torso.position.y = 0.9 + Math.abs(Math.sin(t)) * 0.03;
+      head.rotation.x = -0.18 + Math.sin(t) * 0.06;
+      rightArm.rotation.x = -0.3 + Math.sin(t) * 0.08;
+      leftArm.rotation.x = -0.3 - Math.sin(t) * 0.08;
+    } else if (state === 'gesturing') {
+      animTime.current += delta * 2.2;
+      const t = animTime.current;
+      // Broad sweeping hand gesture pointing to horizon/realm
+      head.rotation.y = 0.15 + Math.sin(t * 0.8) * 0.1;
+      rightArm.rotation.x = -0.85 + Math.sin(t) * 0.25;
+      rightArm.rotation.y = 0.3 + Math.sin(t * 1.2) * 0.2;
+      rightArm.rotation.z = 0.2;
+      leftArm.rotation.x = -0.2;
+      torso.rotation.x = 0.08;
     } else if (state === 'inspecting') {
       animTime.current += delta * 1.8;
       const t = animTime.current;

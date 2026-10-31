@@ -6,6 +6,7 @@ import { RigidBody, CapsuleCollider, RapierRigidBody } from '@react-three/rapier
 import * as THREE from 'three';
 
 import { useCharacterControls } from '@/hooks/useCharacterControls';
+import { usePlayerProgression } from '@/hooks/usePlayerProgression';
 import {
   PHYSICS_CONFIG,
   calculateCameraRelativeMovement,
@@ -42,19 +43,20 @@ export function PlayerController({
 
   // Input Controls Hook
   const { controls } = useCharacterControls();
+  const { statBoosts } = usePlayerProgression();
 
   // Character Mesh Instance
   const characterGroup = useMemo(() => {
     return createCharacterMesh({ faction, isPlayer: true });
   }, [faction]);
 
-  // Player State
-  const [playerPosition, setPlayerPosition] = useState<THREE.Vector3>(
+  // Player State (Decoupled with refs to ensure 0 React re-renders during 60 FPS locomotion)
+  const playerPositionRef = useRef<THREE.Vector3>(
     new THREE.Vector3(...initialPosition)
   );
-  const [characterSpeed, setCharacterSpeed] = useState(0);
-  const [isGrounded, setIsGrounded] = useState(true);
-  const [verticalVelocity, setVerticalVelocity] = useState(0);
+  const characterSpeedRef = useRef<number>(0);
+  const isGroundedRef = useRef<boolean>(true);
+  const verticalVelocityRef = useRef<number>(0);
 
   // Camera Horizontal Yaw tracking
   const cameraYawRef = useRef(0);
@@ -77,13 +79,12 @@ export function PlayerController({
     // 1. Current Physics Translation & Velocity
     const translation = rb.translation();
     const linvel = rb.linvel();
-    const currentPos = new THREE.Vector3(translation.x, translation.y, translation.z);
-    setPlayerPosition(currentPos);
-    setVerticalVelocity(linvel.y);
+    playerPositionRef.current.set(translation.x, translation.y, translation.z);
+    verticalVelocityRef.current = linvel.y;
 
     // Ground check: character grounded if Y velocity is nearly 0 or small downward
     const grounded = Math.abs(linvel.y) < 0.35;
-    setIsGrounded(grounded);
+    isGroundedRef.current = grounded;
 
     // 2. Camera-Relative Locomotion
     const { moveDirection, hasInput, targetAngle } = calculateCameraRelativeMovement(
@@ -94,10 +95,12 @@ export function PlayerController({
       cameraYawRef.current
     );
 
-    // Calculate target speed
-    const baseSpeed = controls.sprint ? PHYSICS_CONFIG.sprintSpeed : PHYSICS_CONFIG.walkSpeed;
+    // Calculate target speed with equipped gear and potion perks
+    const speedMultiplier = 1 + (statBoosts?.movementSpeedPct || 0) / 100;
+    const baseSpeed =
+      (controls.sprint ? PHYSICS_CONFIG.sprintSpeed : PHYSICS_CONFIG.walkSpeed) * speedMultiplier;
     const currentHorizontalSpeed = hasInput ? baseSpeed : 0;
-    setCharacterSpeed(currentHorizontalSpeed);
+    characterSpeedRef.current = currentHorizontalSpeed;
 
     // Apply Velocity to Rapier RigidBody
     let targetVelX = linvel.x;
@@ -132,6 +135,7 @@ export function PlayerController({
     rb.setLinvel({ x: targetVelX, y: targetVelY, z: targetVelZ }, true);
 
     // 4. Notify position listeners with smart throttling to prevent React reconciliation lag
+    const currentPos = playerPositionRef.current;
     const distFromLastEmit = currentPos.distanceTo(lastEmitPos.current);
     const now = performance.now();
 
@@ -161,7 +165,7 @@ export function PlayerController({
     <>
       {/* GTA-style Over-the-Shoulder Third-Person Camera */}
       <ThirdPersonCamera
-        targetPosition={playerPosition}
+        targetPosition={playerPositionRef}
         isSprinting={controls.sprint}
         isPointerLockDisabled={isPointerLockDisabled}
         onCameraYawChange={(yaw) => {
@@ -194,10 +198,10 @@ export function PlayerController({
       {/* Procedural Character Animation Driver */}
       <CharacterAnimation
         characterGroup={characterGroup}
-        speed={characterSpeed}
+        speed={characterSpeedRef}
         isSprinting={controls.sprint}
-        isGrounded={isGrounded}
-        verticalVelocity={verticalVelocity}
+        isGrounded={isGroundedRef}
+        verticalVelocity={verticalVelocityRef}
       />
     </>
   );

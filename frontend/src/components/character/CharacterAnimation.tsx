@@ -9,10 +9,10 @@ export type LocomotionState = 'idle' | 'walk' | 'run' | 'jump' | 'fall';
 
 export interface CharacterAnimationProps {
   characterGroup: THREE.Group | null;
-  speed: number;
+  speed: number | React.MutableRefObject<number>;
   isSprinting: boolean;
-  isGrounded: boolean;
-  verticalVelocity: number;
+  isGrounded: boolean | React.MutableRefObject<boolean>;
+  verticalVelocity: number | React.MutableRefObject<number>;
 }
 
 /**
@@ -30,19 +30,30 @@ export function CharacterAnimation({
   const animTime = useRef(0);
   const currentState = useRef<LocomotionState>('idle');
 
-  // Determine active locomotion state
-  let state: LocomotionState = 'idle';
-  if (!isGrounded) {
-    state = verticalVelocity > 0.5 ? 'jump' : 'fall';
-  } else if (speed > 0.3) {
-    state = isSprinting && speed > 5.0 ? 'run' : 'walk';
-  } else {
-    state = 'idle';
-  }
-  currentState.current = state;
-
   useFrame((_, delta) => {
     if (!characterGroup) return;
+
+    const currentSpeed =
+      speed && typeof speed === 'object' && 'current' in speed ? speed.current : (speed as number);
+    const currentGrounded =
+      isGrounded && typeof isGrounded === 'object' && 'current' in isGrounded
+        ? isGrounded.current
+        : (isGrounded as boolean);
+    const currentVertVel =
+      verticalVelocity && typeof verticalVelocity === 'object' && 'current' in verticalVelocity
+        ? verticalVelocity.current
+        : (verticalVelocity as number);
+
+    // Determine active locomotion state inside frame loop
+    let state: LocomotionState = 'idle';
+    if (!currentGrounded) {
+      state = currentVertVel > 0.5 ? 'jump' : 'fall';
+    } else if (currentSpeed > 0.3) {
+      state = isSprinting && currentSpeed > 5.0 ? 'run' : 'walk';
+    } else {
+      state = 'idle';
+    }
+    currentState.current = state;
 
     const joints: CharacterJoints | undefined = characterGroup.userData?.joints;
     if (!joints) return;
@@ -100,17 +111,22 @@ export function CharacterAnimation({
     } else {
       // Idle Breathing & subtle weight shift
       const breath = Math.sin(t) * 0.02;
+      const weightShift = Math.sin(t * 0.3) * 0.03;
       torso.position.y = THREE.MathUtils.lerp(torso.position.y, 0.9 + breath, 0.1);
-      head.rotation.x = THREE.MathUtils.lerp(head.rotation.x, Math.sin(t * 0.7) * 0.02, 0.1);
+      torso.rotation.z = THREE.MathUtils.lerp(torso.rotation.z, weightShift, 0.08); // Subtle hip shift
+      torso.rotation.y = THREE.MathUtils.lerp(torso.rotation.y, Math.sin(t * 0.25) * 0.04, 0.1);
 
-      // Return limbs to neutral rest
-      leftArm.rotation.x = THREE.MathUtils.lerp(leftArm.rotation.x, 0, 0.15);
-      rightArm.rotation.x = THREE.MathUtils.lerp(rightArm.rotation.x, 0, 0.15);
-      leftArm.rotation.z = THREE.MathUtils.lerp(leftArm.rotation.z, -0.05, 0.15);
-      rightArm.rotation.z = THREE.MathUtils.lerp(rightArm.rotation.z, 0.05, 0.15);
-      leftLeg.rotation.x = THREE.MathUtils.lerp(leftLeg.rotation.x, 0, 0.15);
-      rightLeg.rotation.x = THREE.MathUtils.lerp(rightLeg.rotation.x, 0, 0.15);
-      torso.rotation.y = THREE.MathUtils.lerp(torso.rotation.y, 0, 0.15);
+      // Head scanning the horizon slowly
+      head.rotation.x = THREE.MathUtils.lerp(head.rotation.x, Math.sin(t * 0.7) * 0.02, 0.1);
+      head.rotation.y = THREE.MathUtils.lerp(head.rotation.y, Math.sin(t * 0.3) * 0.06, 0.08);
+
+      // Return limbs to natural relaxed heroic rest
+      leftArm.rotation.x = THREE.MathUtils.lerp(leftArm.rotation.x, Math.sin(t * 0.5) * 0.03, 0.15);
+      rightArm.rotation.x = THREE.MathUtils.lerp(rightArm.rotation.x, -Math.sin(t * 0.5) * 0.03, 0.15);
+      leftArm.rotation.z = THREE.MathUtils.lerp(leftArm.rotation.z, -0.08, 0.15);
+      rightArm.rotation.z = THREE.MathUtils.lerp(rightArm.rotation.z, 0.08, 0.15);
+      leftLeg.rotation.x = THREE.MathUtils.lerp(leftLeg.rotation.x, weightShift * 0.5, 0.15);
+      rightLeg.rotation.x = THREE.MathUtils.lerp(rightLeg.rotation.x, -weightShift * 0.5, 0.15);
     }
   });
 

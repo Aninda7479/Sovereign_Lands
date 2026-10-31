@@ -173,12 +173,22 @@ const STATIC_BLIPS: BlipInfo[] = [
   {
     id: 'npc_beatrice',
     label: 'Sister Beatrice',
-    role: 'Sanctuary Healer',
+    role: 'Sanctuary Apothecary',
     worldX: -80,
     worldZ: -132,
     type: 'npc',
-    color: '#6366f1', // indigo-500
-    badge: '✨',
+    color: '#10b981', // emerald-500
+    badge: '🧪',
+  },
+  {
+    id: 'arcane_observatory',
+    label: 'Archmage Vaelin',
+    role: 'The Arcane Reliquary',
+    worldX: -94,
+    worldZ: -96,
+    type: 'npc',
+    color: '#8b5cf6', // purple-500
+    badge: '🔮',
   },
   {
     id: 'npc_kaelen',

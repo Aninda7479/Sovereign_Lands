@@ -13,6 +13,7 @@ import {
   ProviderConfig,
 } from './types';
 import { keyVault } from './KeyVault';
+import { OpenCodeAdapter } from './OpenCodeAdapter';
 import { OpenAIAdapter } from './OpenAIAdapter';
 import { GeminiAdapter } from './GeminiAdapter';
 import { AnthropicAdapter } from './AnthropicAdapter';
@@ -165,6 +166,9 @@ export class ProviderFactory {
     let adapter: AIAdapter;
 
     switch (provider) {
+      case 'opencode':
+        adapter = new OpenCodeAdapter(config);
+        break;
       case 'openai':
         adapter = new OpenAIAdapter(config);
         break;
@@ -202,6 +206,29 @@ export class ProviderFactory {
     } catch (err) {
       console.warn('[ProviderFactory] Active adapter failed, falling back to mock:', err);
       return await this.mockAdapter.generateNPCResponse(context);
+    }
+  }
+
+  /**
+   * Helper shortcut to stream dialogue response in real-time
+   */
+  public async generateNPCResponseStream(
+    context: NPCConversationContext,
+    onToken: (chunk: string, fullText: string) => void
+  ): Promise<string> {
+    const adapter = this.getActiveAdapter();
+    try {
+      if (adapter.generateNPCResponseStream) {
+        return await adapter.generateNPCResponseStream(context, onToken);
+      }
+      const full = await adapter.generateNPCResponse(context);
+      onToken(full, full);
+      return full;
+    } catch (err) {
+      console.warn('[ProviderFactory] Active adapter stream failed, falling back to mock:', err);
+      const mockText = await this.mockAdapter.generateNPCResponse(context);
+      onToken(mockText, mockText);
+      return mockText;
     }
   }
 

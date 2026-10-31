@@ -44,6 +44,25 @@ interface ProviderMeta {
 
 const PROVIDERS: ProviderMeta[] = [
   {
+    id: 'opencode',
+    name: 'OpenCode Free Tier',
+    badge: '100% Free & Keyless',
+    description: 'Instant zero-key gateway to frontier coding & reasoning models (MiMo Flash, Beam 1M, Nemotron, DeepSeek).',
+    defaultModels: [
+      'mimo-v2.6-flash-free',
+      'beam-free',
+      'nemotron-3.5-lightning-free',
+      'flint-40b-free',
+      'deepseek-v4.1-flash-free',
+      'big-pickle',
+      'nemotron-3.5-super-vl-free',
+      'glm-5.3-flash-free',
+    ],
+    docUrl: 'https://opencode.ai',
+    color: 'from-emerald-500 to-teal-600',
+    requiresKey: false,
+  },
+  {
     id: 'gemini',
     name: 'Google Gemini',
     badge: 'Recommended',
@@ -106,8 +125,8 @@ const PROVIDERS: ProviderMeta[] = [
 ];
 
 export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
-  const [selectedProvider, setSelectedProvider] = useState<AIProviderType>('gemini');
-  const [activeProvider, setActiveProvider] = useState<AIProviderType>('mock');
+  const [selectedProvider, setSelectedProvider] = useState<AIProviderType>('opencode');
+  const [activeProvider, setActiveProvider] = useState<AIProviderType>('opencode');
   const [apiKeyInput, setApiKeyInput] = useState<string>('');
   const [showKey, setShowKey] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<string>('');

@@ -13,7 +13,14 @@ export type NPCBehaviorState =
   | 'warming_hands'
   | 'looking_around'
   | 'working'
-  | 'conversing';
+  | 'conversing'
+  | 'bowing'
+  | 'saluting'
+  | 'waving'
+  | 'shrugging'
+  | 'laughing'
+  | 'gesturing'
+  | 'thinking';
 
 export interface NPCRoamingSnapshot {
   npcId: string;
@@ -38,6 +45,8 @@ export class NPCRoamingController {
   private isConversing = false;
   private activeBark?: string;
   private barkTimer = 0;
+  private activeGesture?: NPCBehaviorState;
+  private gestureTimer = 0;
 
   // Custom override target (e.g. from LLM spatial routine actions)
   private overrideTarget: [number, number, number] | null = null;
@@ -105,17 +114,33 @@ export class NPCRoamingController {
   }
 
   /**
+   * Trigger a physical procedural 3D body movement/gesture (bow, salute, wave, nod, etc.)
+   */
+  public triggerGesture(gesture: NPCBehaviorState, duration = 3.2): void {
+    this.activeGesture = gesture;
+    this.gestureTimer = duration;
+    this.behaviorState = gesture;
+  }
+
+  /**
    * Main per-frame update loop
    */
   public update(
     delta: number,
     playerPosition?: [number, number, number] | { x: number; y: number; z: number }
   ): NPCRoamingSnapshot {
-    // 1. Tick bark timer
+    // 1. Tick bark & gesture timers
     if (this.barkTimer > 0) {
       this.barkTimer -= delta;
       if (this.barkTimer <= 0) {
         this.activeBark = undefined;
+      }
+    }
+
+    if (this.gestureTimer > 0) {
+      this.gestureTimer -= delta;
+      if (this.gestureTimer <= 0) {
+        this.activeGesture = undefined;
       }
     }
 
@@ -133,7 +158,11 @@ export class NPCRoamingController {
 
     // 3. If in active conversation or player is directly engaging
     if (this.isConversing || (isNearPlayer && distToPlayer < 2.0)) {
-      this.behaviorState = 'conversing';
+      if (this.activeGesture) {
+        this.behaviorState = this.activeGesture;
+      } else {
+        this.behaviorState = 'conversing';
+      }
       this.currentSpeed = 0;
 
       // Smoothly turn to face player

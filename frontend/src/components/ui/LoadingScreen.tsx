@@ -13,35 +13,76 @@ const LORE_TIPS = [
   'Trading caravans cross the Great Stone Bridge daily to barter wheat, timber, and forged iron.',
 ];
 
+const LOADING_STAGES = [
+  'Forging Realm Connection...',
+  'Compiling 3D Engine & WebGL Shaders...',
+  'Generating Terrain & Great Divide River...',
+  'Summoning NPCs & Citadel Council...',
+  'Loading Sovereign On-Chain Parcels...',
+  'Preparing Player Avatar & Web3 Vault...',
+];
+
 interface LoadingScreenProps {
   progress?: number;
   statusText?: string;
 }
 
-export function LoadingScreen({ progress = 0, statusText = 'Entering Sovereign Lands...' }: LoadingScreenProps) {
+export function LoadingScreen({ progress = 0, statusText }: LoadingScreenProps) {
   const [tipIndex, setTipIndex] = useState(0);
+  const [simulatedProgress, setSimulatedProgress] = useState(progress > 0 ? progress : 18);
+  const [stageIndex, setStageIndex] = useState(0);
 
+  // Tip cycle
   useEffect(() => {
     setTipIndex(Math.floor(Math.random() * LORE_TIPS.length));
     const interval = setInterval(() => {
       setTipIndex((prev) => (prev + 1) % LORE_TIPS.length);
-    }, 4500);
+    }, 4200);
     return () => clearInterval(interval);
   }, []);
 
+  // Stage cycle & simulated progress increment
+  useEffect(() => {
+    if (progress > 0) {
+      setSimulatedProgress(progress);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setSimulatedProgress((prev) => {
+        if (prev < 40) return prev + Math.random() * 6 + 3;
+        if (prev < 75) return prev + Math.random() * 4 + 1.5;
+        if (prev < 92) return prev + Math.random() * 1.5 + 0.5;
+        return prev;
+      });
+    }, 350);
+
+    const stageTimer = setInterval(() => {
+      setStageIndex((prev) => (prev + 1) % LOADING_STAGES.length);
+    }, 2400);
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(stageTimer);
+    };
+  }, [progress]);
+
+  const activeStatus = statusText || LOADING_STAGES[stageIndex];
+  const activePercent = Math.min(99, Math.round(progress > 0 ? progress : simulatedProgress));
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md px-4 select-none">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 px-4 select-none">
       {/* Background Medieval Vignette & Motif */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent via-slate-950/70 to-slate-950 pointer-events-none" />
 
       {/* Ornate Frame Container */}
-      <div className="relative z-10 flex flex-col items-center max-w-lg w-full p-8 border-2 border-amber-600/40 rounded-2xl bg-slate-900/80 shadow-2xl shadow-black/80 text-center">
+      <div className="relative z-10 flex flex-col items-center max-w-lg w-full p-8 border-2 border-amber-600/40 rounded-2xl bg-slate-900/90 shadow-2xl shadow-black/80 text-center backdrop-blur-md">
         {/* Animated Faction Crest */}
         <div className="relative mb-6">
           <div className="w-20 h-20 rounded-full border-2 border-amber-400/50 flex items-center justify-center bg-gradient-to-b from-amber-500/20 to-sky-500/20 shadow-lg shadow-amber-500/20 animate-pulse">
             <span className="text-4xl filter drop-shadow">⚔️</span>
           </div>
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-500 border border-slate-950 flex items-center justify-center text-xs font-bold text-slate-950">
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-500 border border-slate-950 flex items-center justify-center text-xs font-bold text-slate-950 shadow-md">
             3D
           </div>
         </div>
@@ -57,13 +98,13 @@ export function LoadingScreen({ progress = 0, statusText = 'Entering Sovereign L
         {/* Status Text & Progress Bar */}
         <div className="w-full mt-6 space-y-2">
           <div className="flex justify-between text-xs text-slate-400 font-medium">
-            <span>{statusText}</span>
-            <span className="text-amber-400 font-mono">{Math.round(progress)}%</span>
+            <span className="animate-fade-in transition-all duration-300">{activeStatus}</span>
+            <span className="text-amber-400 font-mono">{activePercent}%</span>
           </div>
           <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/60 shadow-inner">
             <div
               className="h-full bg-gradient-to-r from-amber-600 via-amber-400 to-sky-400 rounded-full transition-all duration-300 shadow-md shadow-amber-400/50"
-              style={{ width: `${Math.max(5, Math.min(100, progress))}%` }}
+              style={{ width: `${Math.max(6, activePercent)}%` }}
             />
           </div>
         </div>
@@ -76,8 +117,14 @@ export function LoadingScreen({ progress = 0, statusText = 'Entering Sovereign L
         </div>
 
         {/* Footer controls hint */}
-        <div className="mt-5 text-[10px] text-slate-500 uppercase tracking-widest">
-          WASD • Orbit Camera • RAPID 3D WebGL • Polygon Amoy
+        <div className="mt-5 text-[10px] text-slate-500 uppercase tracking-widest flex items-center justify-center gap-2">
+          <span>WASD Movement</span>
+          <span>•</span>
+          <span>Orbit Camera</span>
+          <span>•</span>
+          <span>Rapier Physics</span>
+          <span>•</span>
+          <span>Polygon Amoy</span>
         </div>
       </div>
     </div>
