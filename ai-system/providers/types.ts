@@ -105,12 +105,31 @@ export interface RateLimiterMetrics {
   isThrottled: boolean;
 }
 
+export type AIErrorCode =
+  | 'NO_API_KEY'
+  | 'RATE_LIMIT_EXCEEDED'
+  | 'QUOTA_EXHAUSTED'
+  | 'NETWORK_ERROR'
+  | 'INVALID_API_KEY'
+  | 'TIMEOUT'
+  | 'UNKNOWN_ERROR';
+
+export interface AIErrorDetails {
+  code: AIErrorCode;
+  provider: AIProviderType;
+  message: string;
+  details?: string;
+  retryAfterSeconds?: number;
+  timestamp: number;
+}
+
 export interface KeyVaultData {
   activeProvider: AIProviderType;
   configs: Record<AIProviderType, ProviderConfig>;
   testResults: Partial<Record<AIProviderType, ConnectionTestResult>>;
   rateLimitRPM: number;
   enableCache: boolean;
+  lastError?: AIErrorDetails | null;
 }
 
 export type ProviderEventType =
@@ -119,7 +138,9 @@ export type ProviderEventType =
   | 'request-start'
   | 'request-end'
   | 'rate-limit-hit'
-  | 'test-complete';
+  | 'test-complete'
+  | 'error-occurred'
+  | 'error-cleared';
 
 export interface ProviderEventPayload {
   type: ProviderEventType;

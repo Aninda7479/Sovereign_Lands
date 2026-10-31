@@ -166,6 +166,13 @@ export class RateLimiter {
     this.responseCache.clear();
   }
 
+  public getRetryAfterSeconds(): number {
+    this.refill();
+    const tokensNeeded = 1 - this.tokens;
+    if (tokensNeeded <= 0) return 0;
+    return Math.max(1, Math.ceil(tokensNeeded / (this.maxRequestsPerMinute / 60)));
+  }
+
   /**
    * Get current metrics for HUD / telemetry.
    */

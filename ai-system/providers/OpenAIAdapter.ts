@@ -51,15 +51,31 @@ RULES FOR DIALOGUE:
     const cached = rateLimiter.getCached<string>(cacheKey);
     if (cached) return cached;
 
-    const allowed = await rateLimiter.acquire(1, 3000);
+    const allowed = await rateLimiter.acquire(1, 1500);
     if (!allowed) {
-      return `*${context.npcName} looks occupied with their duties and signals you to wait a moment.*`;
+      const waitSec = rateLimiter.getRetryAfterSeconds();
+      keyVault.setLastError({
+        code: 'RATE_LIMIT_EXCEEDED',
+        provider: 'openai',
+        message: `AI Rate Limit Reached: OpenAI throttled (${rateLimiter.getLimit()} req/min).`,
+        details: `Throttled to avoid API exhaustion. Resumes in ~${waitSec}s.`,
+        retryAfterSeconds: waitSec,
+        timestamp: Date.now(),
+      });
+      return this.getFallbackDialogue(context);
     }
 
     const config = this.getConfig();
     const apiKey = config.apiKey || keyVault.getApiKey('openai');
 
     if (!apiKey) {
+      keyVault.setLastError({
+        code: 'NO_API_KEY',
+        provider: 'openai',
+        message: 'OpenAI API Key Not Connected.',
+        details: 'Please add your OpenAI API key in Settings [K] or switch to Offline Mock Mode.',
+        timestamp: Date.now(),
+      });
       return this.getFallbackDialogue(context);
     }
 
@@ -107,10 +123,24 @@ RULES FOR DIALOGUE:
       if (!text) throw new Error('Empty response from OpenAI');
 
       rateLimiter.setCached(cacheKey, text, 90 * 1000);
+      keyVault.clearError();
       keyVault.emitEvent('request-end', 'openai', { success: true });
       return text;
     } catch (err: any) {
       console.warn('[OpenAIAdapter] Error generating response, using fallback:', err.message);
+      const isQuota = err.message?.includes('429') || err.message?.includes('insufficient_quota');
+      const isAuth = err.message?.includes('401') || err.message?.includes('Incorrect API key');
+      keyVault.setLastError({
+        code: isQuota ? 'QUOTA_EXHAUSTED' : isAuth ? 'INVALID_API_KEY' : 'NETWORK_ERROR',
+        provider: 'openai',
+        message: isQuota
+          ? 'OpenAI API Quota Exceeded (HTTP 429).'
+          : isAuth
+          ? 'OpenAI API Key Authentication Failed (401).'
+          : `OpenAI Error: ${err.message}`,
+        details: err.message,
+        timestamp: Date.now(),
+      });
       keyVault.emitEvent('request-end', 'openai', { success: false, error: err.message });
       return this.getFallbackDialogue(context);
     }

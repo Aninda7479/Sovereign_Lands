@@ -4,7 +4,17 @@
  * for living open-world 3D entities roaming the sandbox.
  */
 
-export type NPCId = 'aldric' | 'gareth' | 'merin' | 'zara';
+export type NPCId =
+  | 'aldric'
+  | 'gareth'
+  | 'merin'
+  | 'zara'
+  | 'eleanor'
+  | 'torvald'
+  | 'lyra'
+  | 'cedric'
+  | 'beatrice'
+  | 'kaelen';
 
 export interface NPCWaypoint {
   position: [number, number, number];
@@ -313,6 +323,408 @@ export const NPC_PROFILES: Record<NPCId, NPCProfile> = {
     ],
     defaultDialogue:
       'Well met, traveler! Rare spices, tempered steel, or spicy rumors—Zara’s pack has whatever your coin can afford. Looking to trade, or just eavesdropping?',
+  },
+
+  eleanor: {
+    id: 'eleanor',
+    name: 'Lady Eleanor',
+    title: 'The Royal Botanist',
+    role: 'Park Overseer & Herbalist',
+    kingdom: 'North',
+    faction: 'neutral',
+    meshType: 'character',
+    personality:
+      'Gentle, poetic noblewoman who tends the Sovereign Public Park. Fascinated by mountain flora, rare blossom trees, and medicinal herbs. Believes the beauty of the gardens can bring peace to war-torn lands.',
+    portraitColor: 'from-emerald-700 to-teal-900',
+    spawnPosition: [34, 1.2, -42],
+    patrolSpeed: 1.1,
+    waypoints: [
+      {
+        position: [34, 1.2, -42],
+        dwellTimeSeconds: 5,
+        idleAction: 'inspect',
+        barkText: 'The pink cherry blossoms are thriving despite the northern breeze.',
+      },
+      {
+        position: [40, 1.2, -48],
+        dwellTimeSeconds: 6,
+        idleAction: 'work',
+        barkText: 'Tending the lavender beds brings peace to this troubled frontier.',
+      },
+      {
+        position: [28, 1.2, -48],
+        dwellTimeSeconds: 4,
+        idleAction: 'look_around',
+        barkText: 'Listen to the fountain waters... A momentary respite from politics.',
+      },
+      {
+        position: [34, 1.2, -54],
+        dwellTimeSeconds: 5,
+        idleAction: 'inspect',
+        barkText: 'These red rosebuds need pruning before the full moon.',
+      },
+    ],
+    ambientBarks: [
+      'Take a seat on the benches, wanderer. Rest your weary bones.',
+      'Even in a realm divided by war, flowers bloom without borders.',
+      'The marble fountain was carved during the Golden Commonwealth era.',
+      'I harvested fresh lavender for travelers suffering sleepless nights.',
+      'Mind you do not trample the flower beds on your rush to the Citadel.',
+    ],
+    quickChoices: [
+      {
+        id: 'park_history',
+        label: 'Ask about the Sovereign Park',
+        prompt: 'Tell me the history of this beautiful park and marble fountain.',
+      },
+      {
+        id: 'herbs',
+        label: 'Inquire about medicinal herbs',
+        prompt: 'What medicinal flowers or herbs do you cultivate here?',
+      },
+      {
+        id: 'fountain_waters',
+        label: 'Ask about the fountain waters',
+        prompt: 'Do the waters of this royal fountain possess rejuvenating properties?',
+      },
+      {
+        id: 'peace',
+        label: 'Discuss the kingdom war',
+        prompt: 'How can peace be restored between the North and South?',
+      },
+    ],
+    defaultDialogue:
+      'Welcome to the Sovereign Gardens, traveler. Pause your march, sit by the marble fountain, and breathe in the scent of blooming lavender. What brings you to this sanctuary?',
+  },
+
+  torvald: {
+    id: 'torvald',
+    name: 'Torvald',
+    title: 'The Master Blacksmith',
+    role: 'Weaponsmith & Armor Crafter',
+    kingdom: 'North',
+    faction: 'north',
+    meshType: 'npc_farmer',
+    personality:
+      'Gruff, robust craftsman whose hammer rings from dawn to midnight. Passionate about folded steel, horseshoeing, and fortress iron fittings. Values hard work and honest trades.',
+    portraitColor: 'from-orange-800 to-zinc-900',
+    spawnPosition: [-22, 1.2, -120],
+    patrolSpeed: 1.2,
+    waypoints: [
+      {
+        position: [-22, 1.2, -120],
+        dwellTimeSeconds: 7,
+        idleAction: 'work',
+        barkText: 'Hammer and anvil, heat and oil... The only honest life.',
+      },
+      {
+        position: [-26, 1.2, -124],
+        dwellTimeSeconds: 5,
+        idleAction: 'warm_hands',
+        barkText: 'Need more charcoal from the woodcutter before dusk.',
+      },
+      {
+        position: [-18, 1.2, -118],
+        dwellTimeSeconds: 4,
+        idleAction: 'inspect',
+        barkText: 'Inspecting these newly tempered iron wall braces.',
+      },
+    ],
+    ambientBarks: [
+      'Good steel speaks louder than silver tongues when sieges come!',
+      'Watch your step near the furnace; sparks fly hot in here.',
+      'If you need horseshoes or curtain wall bolts, you come to Torvald.',
+      'Southern steel is too brittle for these freezing rocky passes.',
+      'Clang, clang! Another blade quenched for the garrison.',
+    ],
+    quickChoices: [
+      {
+        id: 'forge_weapons',
+        label: 'Ask about weapons and armor',
+        prompt: 'What weapons and armor are you forging for the garrison?',
+      },
+      {
+        id: 'building_materials',
+        label: 'Inquire about building ironwork',
+        prompt: 'Can you provide iron braces and nails for my new houses and watchtowers?',
+      },
+      {
+        id: 'steel_secrets',
+        label: 'Ask about northern steel',
+        prompt: 'What makes northern forged steel so durable against sieges?',
+      },
+      {
+        id: 'iron_ore',
+        label: 'Inquire about iron mines',
+        prompt: 'Where can an adventurer mine high-grade iron ore in the mountains?',
+      },
+    ],
+    defaultDialogue:
+      'Hah! Step away from the slag heap if you value your boots. Torvald’s the name, forging the finest steel between here and the Frost Ridge. Need an axe sharpened or iron fittings for your parcel?',
+  },
+
+  lyra: {
+    id: 'lyra',
+    name: 'Lyra',
+    title: 'The Wandering Minstrel',
+    role: 'Bard & Balladeer',
+    kingdom: 'Neutral',
+    faction: 'neutral',
+    meshType: 'character',
+    personality:
+      'Charming, flamboyant storyteller and singer who performs in village squares and taverns. Knows old songs of forgotten kings, dragon lore, and spicy gossip from both kingdoms.',
+    portraitColor: 'from-rose-700 to-purple-800',
+    spawnPosition: [-46, 1.2, -94],
+    patrolSpeed: 1.3,
+    waypoints: [
+      {
+        position: [-46, 1.2, -94],
+        dwellTimeSeconds: 6,
+        idleAction: 'look_around',
+        barkText: 'La-la-loo... A tune for the brave, a ballad for the broken.',
+      },
+      {
+        position: [-52, 1.2, -102],
+        dwellTimeSeconds: 5,
+        idleAction: 'inspect',
+        barkText: 'Tuning the strings beside the fountain basin...',
+      },
+      {
+        position: [-42, 1.2, -88],
+        dwellTimeSeconds: 4,
+        idleAction: 'look_around',
+        barkText: 'Ah, travelers gather! Time for the Ballad of the Great Divide.',
+      },
+    ],
+    ambientBarks: [
+      'Sing of kings and sing of knaves, all shall rest in equal graves!',
+      'Got a shiny coin for a song that will stir your heroic heart?',
+      'Did you hear the tale of the phantom knight on the river bridge?',
+      'The tavern ale is sour today, but my lyrics are as sweet as honey.',
+      'Every hero needs a bard to chronicle their deeds in verse!',
+    ],
+    quickChoices: [
+      {
+        id: 'sing_ballad',
+        label: 'Request a ballad of the realm',
+        prompt: 'Sing me a ballad about the creation of the Sovereign Lands.',
+      },
+      {
+        id: 'gossip_taverns',
+        label: 'Ask about tavern gossip',
+        prompt: 'What spicy rumors and gossip have you overheard in the taverns?',
+      },
+      {
+        id: 'ancient_legends',
+        label: 'Inquire about ancient legends',
+        prompt: 'Are there forgotten treasures or magical secrets hidden in the mountains?',
+      },
+      {
+        id: 'tip_coin',
+        label: 'Toss a gold coin to the bard',
+        prompt: 'Here is a gold coin for your melodies, minstrel.',
+      },
+    ],
+    defaultDialogue:
+      'Greetings, noble champion! Lyra at your service, collector of rhymes and teller of grand adventures. Shall I weave you a song of heroic triumph or whisper secrets overheard in the shadows?',
+  },
+
+  cedric: {
+    id: 'cedric',
+    name: 'Cedric',
+    title: 'The Guild Merchant',
+    role: 'Market Trader & Caravan Master',
+    kingdom: 'North',
+    faction: 'north',
+    meshType: 'npc_farmer',
+    personality:
+      'Calculating, charismatic merchant who manages the village marketplace. Always looking for profitable trade routes, rare gemstones, and frontier commodities.',
+    portraitColor: 'from-amber-600 to-yellow-900',
+    spawnPosition: [-56, 1.2, -114],
+    patrolSpeed: 1.2,
+    waypoints: [
+      {
+        position: [-56, 1.2, -114],
+        dwellTimeSeconds: 6,
+        idleAction: 'work',
+        barkText: 'Checking the inventory crates: fine fabrics, dried meats, salt.',
+      },
+      {
+        position: [-62, 1.2, -110],
+        dwellTimeSeconds: 5,
+        idleAction: 'inspect',
+        barkText: 'Gold exchange rates fluctuate with every parcel claimed.',
+      },
+      {
+        position: [-50, 1.2, -118],
+        dwellTimeSeconds: 4,
+        idleAction: 'look_around',
+        barkText: 'A good merchant never misses an approaching customer.',
+      },
+    ],
+    ambientBarks: [
+      'Finest wares in the northern territory! Inspect the goods yourself.',
+      'Buy low, sell high, and always keep an eye on the bridge guards.',
+      'Caravan just arrived from the eastern valley with rare building timber.',
+      'A coin well spent today yields three tomorrow in Sovereign Lands.',
+      'Interested in trading rare architectural blueprints for your estate?',
+    ],
+    quickChoices: [
+      {
+        id: 'trade_wares',
+        label: 'Inspect trade catalog',
+        prompt: 'What goods and materials do you currently have for sale?',
+      },
+      {
+        id: 'market_trends',
+        label: 'Ask about market economics',
+        prompt: 'How is the market economy and gold generation behaving across parcels?',
+      },
+      {
+        id: 'caravan_routes',
+        label: 'Inquire about caravan routes',
+        prompt: 'Are trade caravan routes safe through the mountain passes?',
+      },
+      {
+        id: 'invest_parcels',
+        label: 'Advice on parcel investments',
+        prompt: 'Which parcel locations yield the best commercial return for merchants?',
+      },
+    ],
+    defaultDialogue:
+      'Ah, a patron of taste! Cedric’s marketplace has supplied kings, builders, and lone wanderers for twenty seasons. Looking to furnish your estate or invest your hard-won gold?',
+  },
+
+  beatrice: {
+    id: 'beatrice',
+    name: 'Sister Beatrice',
+    title: 'The Sanctuary Healer',
+    role: 'Priestess & Apothecary',
+    kingdom: 'North',
+    faction: 'neutral',
+    meshType: 'npc_advisor',
+    personality:
+      'Serene, compassionate priestess tending the mountain shrine and herbal dispensary. Cares for wounded soldiers and weary pioneers without regard to faction or banner.',
+    portraitColor: 'from-sky-800 to-indigo-950',
+    spawnPosition: [-80, 1.4, -132],
+    patrolSpeed: 1.1,
+    waypoints: [
+      {
+        position: [-80, 1.4, -132],
+        dwellTimeSeconds: 6,
+        idleAction: 'inspect',
+        barkText: 'Lighting the sacred incense candles for fallen warriors.',
+      },
+      {
+        position: [-86, 1.4, -136],
+        dwellTimeSeconds: 5,
+        idleAction: 'work',
+        barkText: 'Crushing mountain roots for healing poultices.',
+      },
+      {
+        position: [-74, 1.4, -128],
+        dwellTimeSeconds: 5,
+        idleAction: 'warm_hands',
+        barkText: 'May the light guide those traversing the frozen peaks.',
+      },
+    ],
+    ambientBarks: [
+      'May the peace of the realm shelter you on your journeys.',
+      'Bring your wounded here; all are welcomed beneath the sanctuary roof.',
+      'The mountain snows wash clean the blood of yesterday’s battles.',
+      'Drink from the spring waters and cleanse your spirit.',
+      'Faith and courage are armor no sword can pierce.',
+    ],
+    quickChoices: [
+      {
+        id: 'healing_blessing',
+        label: 'Request a sacred blessing',
+        prompt: 'Bestow upon me your blessing before I venture into danger.',
+      },
+      {
+        id: 'sanctuary_history',
+        label: 'Ask about the mountain shrine',
+        prompt: 'What deity or sovereign history is honored at this mountain shrine?',
+      },
+      {
+        id: 'healing_remedies',
+        label: 'Inquire about herbal remedies',
+        prompt: 'What remedies do you prepare for the wounded soldiers of the border?',
+      },
+      {
+        id: 'divine_guidance',
+        label: 'Seek wisdom on realm strife',
+        prompt: 'What guidance does the sanctuary offer on this endless border war?',
+      },
+    ],
+    defaultDialogue:
+      'Peace be with you, child of the frontier. Whether your wounds be of steel or sorrow, the sanctuary doors remain open. How may I aid your spirit this day?',
+  },
+
+  kaelen: {
+    id: 'kaelen',
+    name: 'Kaelen',
+    title: 'The Mountain Ranger',
+    role: 'Frontier Scout & Pathfinder',
+    kingdom: 'North',
+    faction: 'north',
+    meshType: 'npc_knight',
+    personality:
+      'Sharp-eyed, stealthy scout who tracks movement across the northern crags and perimeter mountain ranges. Knows every mountain pass, predator den, and hidden trail.',
+    portraitColor: 'from-slate-800 to-stone-900',
+    spawnPosition: [-112, 1.8, -62],
+    patrolSpeed: 1.6,
+    waypoints: [
+      {
+        position: [-112, 1.8, -62],
+        dwellTimeSeconds: 5,
+        idleAction: 'look_around',
+        barkText: 'Tracks in the snow... A wolf pack circled the western ridge.',
+      },
+      {
+        position: [-120, 1.9, -70],
+        dwellTimeSeconds: 4,
+        idleAction: 'inspect',
+        barkText: 'The pine pass is clear. No southern scouts spotted.',
+      },
+      {
+        position: [-105, 1.7, -54],
+        dwellTimeSeconds: 5,
+        idleAction: 'look_around',
+        barkText: 'Scanning the river approaches from this elevated vantage.',
+      },
+    ],
+    ambientBarks: [
+      'Keep quiet in the pine valleys; sound carries far in cold air.',
+      'Wolves prowl the western ridges. Keep your torches lit at night.',
+      'The mountain passes are treacherous for those without seasoned boots.',
+      'I scouted the perimeter mountains. The boundary stands firm.',
+      'Trust your instincts, pioneer. The frontier does not forgive mistakes.',
+    ],
+    quickChoices: [
+      {
+        id: 'scout_report',
+        label: 'Ask for frontier scout report',
+        prompt: 'What threats or movements have you spotted in the mountain passes?',
+      },
+      {
+        id: 'mountain_paths',
+        label: 'Inquire about hidden trails',
+        prompt: 'Are there hidden mountain trails that flank the river divide?',
+      },
+      {
+        id: 'wildlife_dangers',
+        label: 'Ask about mountain beasts',
+        prompt: 'What dangerous wildlife inhabits the outer mountain foothills?',
+      },
+      {
+        id: 'survival_tips',
+        label: 'Request frontier survival advice',
+        prompt: 'What advice do you have for surviving the harsh northern wilderness?',
+      },
+    ],
+    defaultDialogue:
+      'Halt. Step softly, friend. Kaelen of the Frontier Rangers. I watch the mountain trails and perimeter ridges so the settlements below can sleep soundly. What brings you into the highlands?',
   },
 };
 

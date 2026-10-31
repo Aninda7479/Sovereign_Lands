@@ -71,6 +71,24 @@ export class MockMedievalAdapter implements AIAdapter {
     if (name.includes('zara') || role.includes('trader')) {
       return `Well met! Rare silks, seasoned steel, or spicy rumors—Zara's caravan has what a discerning traveler needs.`;
     }
+    if (name.includes('eleanor') || role.includes('botanist') || role.includes('park')) {
+      return `The park is peaceful today, traveler. May the fragrance of blooming lavender ease your journey.`;
+    }
+    if (name.includes('torvald') || role.includes('smith')) {
+      return `Good steel and steady iron! Tell me what you need forged for your estate, and I'll strike it true.`;
+    }
+    if (name.includes('lyra') || role.includes('bard') || role.includes('minstrel')) {
+      return `Ah, a song for your ears! Tales of valiant heroes and lost kingdoms echo across this very square!`;
+    }
+    if (name.includes('cedric') || role.includes('merchant')) {
+      return `Step right up! Fine building timber, mountain minerals, and silk bolts fresh from the caravan!`;
+    }
+    if (name.includes('beatrice') || role.includes('healer') || role.includes('priestess')) {
+      return `Blessings upon you, traveler. Drink from the mountain spring and rest your weary soul beneath the sanctuary.`;
+    }
+    if (name.includes('kaelen') || role.includes('ranger') || role.includes('scout')) {
+      return `Keep your eyes on the high ridges, traveler. The perimeter mountain trails are cold and unforgiving.`;
+    }
 
     return `Greetings, wanderer. Walk carefully upon these sovereign lands; adventure and danger share the same road.`;
   }

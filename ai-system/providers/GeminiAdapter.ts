@@ -51,15 +51,31 @@ INSTRUCTIONS:
     const cached = rateLimiter.getCached<string>(cacheKey);
     if (cached) return cached;
 
-    const allowed = await rateLimiter.acquire(1, 3000);
+    const allowed = await rateLimiter.acquire(1, 1500);
     if (!allowed) {
-      return `*${context.npcName} gestures quickly that they are busy right now.*`;
+      const waitSec = rateLimiter.getRetryAfterSeconds();
+      keyVault.setLastError({
+        code: 'RATE_LIMIT_EXCEEDED',
+        provider: 'gemini',
+        message: `AI Rate Limit Reached: Gemini quota throttled (${rateLimiter.getLimit()} req/min limit).`,
+        details: `Throttled to avoid API exhaustion. Resumes in ~${waitSec}s.`,
+        retryAfterSeconds: waitSec,
+        timestamp: Date.now(),
+      });
+      return this.getFallbackDialogue(context);
     }
 
     const config = this.getConfig();
     const apiKey = config.apiKey || keyVault.getApiKey('gemini');
 
     if (!apiKey) {
+      keyVault.setLastError({
+        code: 'NO_API_KEY',
+        provider: 'gemini',
+        message: 'Google Gemini API Key Not Connected.',
+        details: 'Please add your Google Gemini API key in Settings [K] or switch to Offline Mock Mode.',
+        timestamp: Date.now(),
+      });
       return this.getFallbackDialogue(context);
     }
 
@@ -114,10 +130,24 @@ INSTRUCTIONS:
       if (!text) throw new Error('Empty response from Gemini');
 
       rateLimiter.setCached(cacheKey, text, 90 * 1000);
+      keyVault.clearError();
       keyVault.emitEvent('request-end', 'gemini', { success: true });
       return text;
     } catch (err: any) {
       console.warn('[GeminiAdapter] Error in generateNPCResponse:', err.message);
+      const isQuota = err.message?.includes('429') || err.message?.includes('quota') || err.message?.includes('RESOURCE_EXHAUSTED');
+      const isAuth = err.message?.includes('401') || err.message?.includes('403') || err.message?.includes('API_KEY_INVALID');
+      keyVault.setLastError({
+        code: isQuota ? 'QUOTA_EXHAUSTED' : isAuth ? 'INVALID_API_KEY' : 'NETWORK_ERROR',
+        provider: 'gemini',
+        message: isQuota
+          ? 'Gemini API Quota Exceeded (HTTP 429).'
+          : isAuth
+          ? 'Gemini API Key Authentication Failed (401/403).'
+          : `Gemini API Error: ${err.message}`,
+        details: err.message,
+        timestamp: Date.now(),
+      });
       keyVault.emitEvent('request-end', 'gemini', { success: false, error: err.message });
       return this.getFallbackDialogue(context);
     }

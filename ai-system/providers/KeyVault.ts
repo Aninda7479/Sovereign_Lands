@@ -11,6 +11,7 @@ import {
   KeyVaultData,
   ProviderEventPayload,
   ProviderEventType,
+  AIErrorDetails,
 } from './types';
 
 const VAULT_STORAGE_KEY = 'sovereign_lands_byoai_vault_v1';
@@ -261,6 +262,29 @@ export class KeyVault {
 
   public setApiKey(provider: AIProviderType, apiKey: string): void {
     this.updateConfig(provider, { apiKey: apiKey.trim() });
+    if (apiKey.trim().length > 0) {
+      this.clearError();
+    }
+  }
+
+  public getLastError(): AIErrorDetails | null {
+    return this.vaultData.lastError || null;
+  }
+
+  public setLastError(error: AIErrorDetails | null): void {
+    this.vaultData.lastError = error;
+    if (error) {
+      this.emitEvent('error-occurred', error.provider, error);
+    } else {
+      this.emitEvent('error-cleared', this.vaultData.activeProvider);
+    }
+  }
+
+  public clearError(): void {
+    if (this.vaultData.lastError) {
+      this.vaultData.lastError = null;
+      this.emitEvent('error-cleared', this.vaultData.activeProvider);
+    }
   }
 
   public removeApiKey(provider: AIProviderType): void {
