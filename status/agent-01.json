@@ -1,5 +1,12 @@
 {
   "agentId": "agent-01",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.300Z"
+  "name": "Smart Contract Core (3D Land Registry)",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T06:25:00Z",
+  "progress": "Drafting SovereignLands.sol 3D parcel bounding box contract...",
+  "exclusiveFiles": [
+    "contracts/src/SovereignLands.sol",
+    "contracts/src/ISovereignLands.sol",
+    "contracts/src/Types.sol"
+  ]
 }
