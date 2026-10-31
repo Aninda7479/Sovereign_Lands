@@ -58,81 +58,53 @@ export function useCharacterControls() {
         return;
       }
 
-      switch (e.code) {
-        case 'KeyW':
-        case 'ArrowUp':
-          updateControls((prev) => (prev.forward ? prev : { ...prev, forward: true }));
-          break;
-        case 'KeyS':
-        case 'ArrowDown':
-          updateControls((prev) => (prev.backward ? prev : { ...prev, backward: true }));
-          break;
-        case 'KeyA':
-        case 'ArrowLeft':
-          updateControls((prev) => (prev.left ? prev : { ...prev, left: true }));
-          break;
-        case 'KeyD':
-        case 'ArrowRight':
-          updateControls((prev) => (prev.right ? prev : { ...prev, right: true }));
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          updateControls((prev) => (prev.sprint ? prev : { ...prev, sprint: true }));
-          break;
-        case 'Space':
-          e.preventDefault();
-          updateControls((prev) => (prev.jump ? prev : { ...prev, jump: true }));
-          break;
-        case 'KeyE':
-          updateControls((prev) => (prev.interact ? prev : { ...prev, interact: true }));
-          break;
-        case 'KeyC':
-          updateControls((prev) => (prev.build ? prev : { ...prev, build: true }));
-          break;
-        case 'KeyB':
-          updateControls((prev) => (prev.buy ? prev : { ...prev, buy: true }));
-          break;
-        default:
-          break;
+      const code = e.code;
+      const key = e.key ? e.key.toLowerCase() : '';
+
+      if (code === 'KeyW' || code === 'ArrowUp' || key === 'w' || key === 'arrowup') {
+        updateControls((prev) => (prev.forward ? prev : { ...prev, forward: true }));
+      } else if (code === 'KeyS' || code === 'ArrowDown' || key === 's' || key === 'arrowdown') {
+        updateControls((prev) => (prev.backward ? prev : { ...prev, backward: true }));
+      } else if (code === 'KeyA' || code === 'ArrowLeft' || key === 'a' || key === 'arrowleft') {
+        updateControls((prev) => (prev.left ? prev : { ...prev, left: true }));
+      } else if (code === 'KeyD' || code === 'ArrowRight' || key === 'd' || key === 'arrowright') {
+        updateControls((prev) => (prev.right ? prev : { ...prev, right: true }));
+      } else if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') {
+        updateControls((prev) => (prev.sprint ? prev : { ...prev, sprint: true }));
+      } else if (code === 'Space' || key === ' ' || key === 'spacebar') {
+        e.preventDefault();
+        updateControls((prev) => (prev.jump ? prev : { ...prev, jump: true }));
+      } else if (code === 'KeyE' || key === 'e') {
+        updateControls((prev) => (prev.interact ? prev : { ...prev, interact: true }));
+      } else if (code === 'KeyC' || key === 'c') {
+        updateControls((prev) => (prev.build ? prev : { ...prev, build: true }));
+      } else if (code === 'KeyB' || key === 'b') {
+        updateControls((prev) => (prev.buy ? prev : { ...prev, buy: true }));
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      switch (e.code) {
-        case 'KeyW':
-        case 'ArrowUp':
-          updateControls((prev) => ({ ...prev, forward: false }));
-          break;
-        case 'KeyS':
-        case 'ArrowDown':
-          updateControls((prev) => ({ ...prev, backward: false }));
-          break;
-        case 'KeyA':
-        case 'ArrowLeft':
-          updateControls((prev) => ({ ...prev, left: false }));
-          break;
-        case 'KeyD':
-        case 'ArrowRight':
-          updateControls((prev) => ({ ...prev, right: false }));
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          updateControls((prev) => ({ ...prev, sprint: false }));
-          break;
-        case 'Space':
-          updateControls((prev) => ({ ...prev, jump: false }));
-          break;
-        case 'KeyE':
-          updateControls((prev) => ({ ...prev, interact: false }));
-          break;
-        case 'KeyC':
-          updateControls((prev) => ({ ...prev, build: false }));
-          break;
-        case 'KeyB':
-          updateControls((prev) => ({ ...prev, buy: false }));
-          break;
-        default:
-          break;
+      const code = e.code;
+      const key = e.key ? e.key.toLowerCase() : '';
+
+      if (code === 'KeyW' || code === 'ArrowUp' || key === 'w' || key === 'arrowup') {
+        updateControls((prev) => ({ ...prev, forward: false }));
+      } else if (code === 'KeyS' || code === 'ArrowDown' || key === 's' || key === 'arrowdown') {
+        updateControls((prev) => ({ ...prev, backward: false }));
+      } else if (code === 'KeyA' || code === 'ArrowLeft' || key === 'a' || key === 'arrowleft') {
+        updateControls((prev) => ({ ...prev, left: false }));
+      } else if (code === 'KeyD' || code === 'ArrowRight' || key === 'd' || key === 'arrowright') {
+        updateControls((prev) => ({ ...prev, right: false }));
+      } else if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') {
+        updateControls((prev) => ({ ...prev, sprint: false }));
+      } else if (code === 'Space' || key === ' ' || key === 'spacebar') {
+        updateControls((prev) => ({ ...prev, jump: false }));
+      } else if (code === 'KeyE' || key === 'e') {
+        updateControls((prev) => ({ ...prev, interact: false }));
+      } else if (code === 'KeyC' || key === 'c') {
+        updateControls((prev) => ({ ...prev, build: false }));
+      } else if (code === 'KeyB' || key === 'b') {
+        updateControls((prev) => ({ ...prev, buy: false }));
       }
     };
 

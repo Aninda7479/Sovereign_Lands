@@ -47,32 +47,36 @@ export function calculateCameraRelativeMovement(
 } {
   const moveDirection = new THREE.Vector3(0, 0, 0);
 
-  let inputZ = 0;
-  let inputX = 0;
+  // Camera horizontal vectors:
+  // Camera sits behind player at (sin(yaw)*dist, ..., cos(yaw)*dist) looking at player.
+  // Therefore, forward (view direction) points in (-sin(yaw), 0, -cos(yaw)).
+  // Right direction points in (cos(yaw), 0, -sin(yaw)).
+  const sinY = Math.sin(cameraYaw);
+  const cosY = Math.cos(cameraYaw);
 
-  if (forward) inputZ += 1;
-  if (backward) inputZ -= 1;
-  if (left) inputX -= 1;
-  if (right) inputX += 1;
+  const camForward = new THREE.Vector3(-sinY, 0, -cosY);
+  const camRight = new THREE.Vector3(cosY, 0, -sinY);
 
-  const hasInput = inputX !== 0 || inputZ !== 0;
+  if (forward) moveDirection.add(camForward);
+  if (backward) moveDirection.sub(camForward);
+  if (right) moveDirection.add(camRight);
+  if (left) moveDirection.sub(camRight);
+
+  const hasInput = moveDirection.lengthSq() > 0.0001;
 
   if (!hasInput) {
     return {
-      moveDirection,
+      moveDirection: new THREE.Vector3(0, 0, 0),
       hasInput: false,
       targetAngle: 0,
     };
   }
 
-  // Calculate local angle relative to forward (0 rad = forward, PI/2 = right, -PI/2 = left, PI = backward)
-  const inputAngle = Math.atan2(inputX, inputZ);
+  moveDirection.normalize();
 
-  // Combine with camera horizontal yaw angle
-  const targetAngle = cameraYaw + inputAngle;
-
-  // Compute world space movement vector
-  moveDirection.set(Math.sin(targetAngle), 0, Math.cos(targetAngle)).normalize();
+  // The 3D character mesh model faces +Z by default.
+  // To rotate the character to face moveDirection (dx, 0, dz):
+  const targetAngle = Math.atan2(moveDirection.x, moveDirection.z);
 
   return {
     moveDirection,
