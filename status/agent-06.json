@@ -1,5 +1,16 @@
 {
   "agentId": "agent-06",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.312Z"
+  "name": "3D Open-World Terrain & Construction",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T06:58:00Z",
+  "progress": "Building 3D terrain mesh, parcel boundary renderer, and holographic construction mode...",
+  "exclusiveFiles": [
+    "frontend/src/components/world/OpenWorldTerrain.tsx",
+    "frontend/src/components/world/ParcelBoundaryRenderer.tsx",
+    "frontend/src/components/world/StructureManager.tsx",
+    "frontend/src/components/world/HologramBuildPreview.tsx",
+    "frontend/src/components/world/WaterRiver.tsx",
+    "frontend/src/hooks/useBuildingPlacement.ts",
+    "frontend/src/lib/world/parcelCoordinates.ts"
+  ]
 }
