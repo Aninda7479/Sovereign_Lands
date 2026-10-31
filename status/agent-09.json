@@ -1,5 +1,15 @@
 {
   "agentId": "agent-09",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.313Z"
+  "name": "3D Roaming NPC Engine & Dialogue HUD",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T07:20:00Z",
+  "progress": "Acquired lock. Building 3D waypoint navigation, proximity trigger, and GTA dialogue interface...",
+  "exclusiveFiles": [
+    "ai-system/npc-engine/NPCManager.ts",
+    "ai-system/npc-engine/NPCRoamingController.ts",
+    "ai-system/npc-engine/NPCProfiles.ts",
+    "frontend/src/components/npc-dialogue/NPCWorldEntity.tsx",
+    "frontend/src/components/npc-dialogue/DialogueHUD.tsx",
+    "frontend/src/components/npc-dialogue/FloatingSpeechBubble.tsx"
+  ]
 }
