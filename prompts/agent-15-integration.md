@@ -63,6 +63,9 @@ export function MainScene() {
         <StructureManager />
         <HologramBuildPreview />
         <PlayerController />
+        {/* Real-Time Multiplayer Remote Players */}
+        <RemotePlayersList />
+        {/* Roaming AI NPCs */}
         <NPCWorldEntity npcId="aldric" />
         <NPCWorldEntity npcId="gareth" />
         <WarTableEntity />

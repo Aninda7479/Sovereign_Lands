@@ -20,6 +20,7 @@ const AGENTS = [
   { id: 'agent-14', name: 'README & 3D Trailer Script' },
   { id: 'agent-15', name: 'Master 3D Scene Assembly' },
   { id: 'agent-16', name: '3D QA & 60 FPS Optimization' },
+  { id: 'agent-17', name: '3D Real-Time Multiplayer Server' },
 ];
 
 function checkStatus() {
@@ -64,7 +65,7 @@ function checkStatus() {
       waitingCount++;
     }
 
-    const padName = agent.name.padEnd(28, ' ');
+    const padName = agent.name.padEnd(30, ' ');
     console.log(`[${agent.id.toUpperCase()}] ${padName} : ${statusText}${details}`);
   });
 
