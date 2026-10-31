@@ -4,28 +4,28 @@ const path = require('path');
 const STATUS_DIR = path.join(__dirname, '..', 'status');
 
 const AGENTS = [
-  { id: 'agent-01', name: 'Smart Contract Core' },
-  { id: 'agent-02', name: 'Contract Testing & Deploy' },
-  { id: 'agent-03', name: 'Game Asset Pipeline' },
-  { id: 'agent-04', name: 'Website Shell & Layout' },
-  { id: 'agent-05', name: 'Game Map & Tile Engine' },
-  { id: 'agent-06', name: 'Governance & War UI' },
-  { id: 'agent-07', name: 'Wallet & Web3 Integration' },
-  { id: 'agent-08', name: 'AI Connection System' },
-  { id: 'agent-09', name: 'NPC Behavior Engine' },
-  { id: 'agent-10', name: 'AI Strategy Advisor' },
-  { id: 'agent-11', name: 'Character & Lore Bible' },
-  { id: 'agent-12', name: 'Player Guide & Tutorial' },
-  { id: 'agent-13', name: 'Technical Documentation' },
-  { id: 'agent-14', name: 'README & Demo Script' },
-  { id: 'agent-15', name: 'Full Integration & Wiring' },
-  { id: 'agent-16', name: 'QA, Polish & Launch' },
+  { id: 'agent-01', name: '3D Land & Economy Contracts' },
+  { id: 'agent-02', name: 'Contract Test & Deploy' },
+  { id: 'agent-03', name: '3D Low-Poly Asset Pipeline' },
+  { id: 'agent-04', name: '3D Canvas & Web Shell' },
+  { id: 'agent-05', name: 'GTA Character & Camera' },
+  { id: 'agent-06', name: '3D Terrain & Building Engine' },
+  { id: 'agent-07', name: '3D Web3 Interaction & HUD' },
+  { id: 'agent-08', name: 'BYOAI Provider Hub' },
+  { id: 'agent-09', name: '3D Roaming NPC Engine' },
+  { id: 'agent-10', name: 'Citadel Tactical War Table' },
+  { id: 'agent-11', name: '3D Kingdom Lore & Monuments' },
+  { id: 'agent-12', name: 'GTA Quest & Radar Mini-Map' },
+  { id: 'agent-13', name: '3D Tech Architecture' },
+  { id: 'agent-14', name: 'README & 3D Trailer Script' },
+  { id: 'agent-15', name: 'Master 3D Scene Assembly' },
+  { id: 'agent-16', name: '3D QA & 60 FPS Optimization' },
 ];
 
 function checkStatus() {
   console.clear();
   console.log('===============================================================');
-  console.log('       🏰 COMMONWEALTH MULTI-AGENT BUILD MONITOR 🏰            ');
+  console.log('   🏰 SOVEREIGN LANDS: 3D OPEN-WORLD MULTI-AGENT MONITOR 🏰    ');
   console.log('===============================================================');
   console.log(new Date().toLocaleString());
   console.log('');

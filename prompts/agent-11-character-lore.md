@@ -1,158 +1,61 @@
-# Agent 11: Character & Lore Bible — World Building
+# Agent 11: 3D Kingdom Lore & World Monuments
 
-## Role
-You are the **Lore Writer & World Builder** for the Commonwealth game. You create the backstory, kingdom histories, character profiles, and the narrative framework that makes the game world feel alive and meaningful.
+---
+## 🔒 BUILT-IN LOCK & PARALLEL EXECUTION PROTOCOL (MANDATORY)
 
-## Context
-Commonwealth is a medieval-themed blockchain kingdom game. Two kingdoms — North and South — compete for dominance on a shared continent. The game itself is mechanical (buy land, build, vote, war), but your lore transforms it from a spreadsheet game into a living world with history, conflict, and personality.
+To enable 100% safe parallel execution alongside 15 other concurrent coding agents with ZERO collision:
 
-The visual style is classic medieval fantasy: castles, farms, walls, knights, advisors, merchants, and farmers in an isometric kingdom.
+1. **ACQUIRE LOCK ON START**:
+   Immediately at the start of your execution:
+   - Create file `status/agent-11.lock`
+   - Update file `status/agent-11.json` with:
+     ```json
+     {
+       "agentId": "agent-11",
+       "name": "3D Kingdom Lore & World Bible",
+       "status": "UNDER_CONSTRUCTION",
+       "startedAt": "2026-10-31T06:00:00Z",
+       "progress": "Writing open-world lore, runestone inscriptions, and kingdom histories...",
+       "exclusiveFiles": [
+         "docs/lore/realm-history.md",
+         "docs/lore/factions-and-heraldry.md",
+         "docs/lore/monument-inscriptions.md",
+         "docs/lore/npc-character-dialogue.md",
+         "docs/lore/in-game-lexicon.md"
+       ]
+     }
+     ```
 
-## Your Deliverables
+2. **EXCLUSIVE FILE JURISDICTION (STRICT BOUNDARY)**:
+   You are strictly permitted to create or modify ONLY files in `docs/lore/**`.
+   ⚠️ **DO NOT TOUCH** `frontend/**` or other doc directories.
 
-### 1. `docs/lore/world-history.md` — The World of Commonwealth
+3. **RELEASE LOCK ON COMPLETION**:
+   - Delete `status/agent-11.lock`
+   - Update `status/agent-11.json` with `"status": "READY"`.
+---
 
-Write the history of the world:
-- **The Continent:** What is this land called? Why was it divided into two kingdoms?
-- **The Ancient Pact:** Long ago, the two kingdoms agreed to share the land, but tensions grew...
-- **The Great Division:** How the river (column 2-3 border) came to divide North and South
-- **The Governance Tradition:** Why decisions are made by collective vote, not by kings
-- **The Gold Economy:** Where does gold come from? Why do farms produce it?
-- **The War Protocol:** Why wars follow strict rules (deterministic, no randomness)
-- **The NFT Connection:** In-world explanation for why land ownership is permanent and non-transferable ("The Ancient Deed")
+## Role & Goal
+You are the **Lead World Builder & Narrative Designer**. You craft the deep lore, faction histories, and environmental storytelling for the 3D open world of Sovereign Lands.
 
-Keep it concise (2-3 pages) but evocative. It should feel like a medieval chronicle.
+## Key Deliverables
 
-### 2. `docs/lore/north-kingdom.md` — The Northern Kingdom
+### 1. `docs/lore/realm-history.md`
+The saga of the Sovereign Continent:
+- The Ancient Cataclysm that carved the Great Divide river.
+- The founding of **Frostfang Citadel** (North Kingdom) and **Solara Keep** (South Kingdom).
+- The Covenant of Land: Why land deeds are permanent, cryptographic seals granted by the ancient monarchs.
 
-- **Name:** Give the North Kingdom a proper name (e.g., "Boreal" or "Winterhold")
-- **Culture:** Cold, disciplined, hardy people. Value defense and caution.
-- **Heraldry:** Blue banners, wolf or snowflake emblem
-- **Architecture:** Stone castles, frost-covered walls, sturdy farms
-- **Values:** Order, unity, preparation. "Build the wall before the storm."
-- **Strengths:** Strong defense culture, cooperative governance
-- **Weaknesses:** Slower to act, sometimes too cautious
-- **Famous Quotes:** 3-5 in-world quotes from North leaders
+### 2. `docs/lore/factions-and-heraldry.md`
+Detailed cultural profiles:
+- **Kingdom of Boreal (The North)**: Slate blue heraldry, Direwolf crest, austere stone fortresses, emphasis on collective fortress defense and mountain mining.
+- **Kingdom of Solara (The South)**: Sun-gold and crimson heraldry, Golden Lion crest, sprawling fertile farmsteads, merchant guilds, rapid economic expansion.
 
-### 3. `docs/lore/south-kingdom.md` — The Southern Kingdom
+### 3. `docs/lore/monument-inscriptions.md`
+Flavor text and lore fragments carved onto 3D runestones, ruins, and bridge plaques scattered across the open world for players to discover when exploring.
 
-- **Name:** Give the South Kingdom a proper name (e.g., "Solara" or "Goldreach")
-- **Culture:** Warm, ambitious, entrepreneurial people. Value growth and boldness.
-- **Heraldry:** Red banners, sun or lion emblem
-- **Architecture:** Terracotta roofs, vine-covered walls, abundant farms
-- **Values:** Ambition, prosperity, courage. "Fortune favors the bold."
-- **Strengths:** Strong economy, aggressive expansion
-- **Weaknesses:** Sometimes overextend, may rush into war
-- **Famous Quotes:** 3-5 in-world quotes from South leaders
+### 4. `docs/lore/npc-character-dialogue.md`
+Pre-authored character bibles and personality seeds for the AI NPC engine (Aldric, Sir Gareth, Merin, Zara) ensuring their dialogue stays authentic and immersive.
 
-### 4. `docs/lore/npc-profiles.md` — Detailed NPC Characters
-
-For each of the 4 NPC types, write a full character profile:
-
-#### Aldric the Farmer (North variant: Bjorn / South variant: Tomás)
-- **Background:** Where they grew up, what motivates them
-- **Personality:** Detailed traits, quirks, fears
-- **Speech patterns:** How they talk (examples of dialogue)
-- **Relationship to player:** They see the player as their lord/employer
-- **Goals:** What they want for the kingdom
-- **Conflict:** Internal struggle (e.g., farmer wants peace but understands war may be needed)
-- **Sample dialogue** (5+ lines for different situations)
-
-#### Sir Gareth the Bold (North: Siegfried / South: Ricardo)
-- Full knight character profile
-
-#### Merin the Wise (North: Freya / South: Abbas)
-- Full advisor character profile
-
-#### Elara the Merchant (North: Ingrid / South: Zara)
-- Full merchant character profile
-
-### 5. `docs/lore/buildings.md` — Building Lore
-
-In-world descriptions of each building type:
-
-**Farm:**
-> "The wheat fields of Commonwealth are legendary. Each stalk seems to grow with the will of its owner, producing gold-weight grain that fills both stomachs and coffers..."
-
-**Castle:**
-> "A castle is not merely stone — it is a declaration. 'We are here, and we will not leave.' The battlements of a Commonwealth castle channel the kingdom's collective strength..."
-
-**Wall:**
-> "The great walls of Commonwealth are as much symbol as structure. They say the walls of the North can withstand any storm, while the walls of the South turn aside the fiercest charge..."
-
-### 6. `docs/lore/governance.md` — The Governance Tradition
-
-Write the in-world justification for the voting system:
-- Why every landowner gets a voice
-- Why vote weight is proportional to land
-- Why proposals need quorum
-- Why the voting window is short ("In times of crisis, decisions must be swift")
-- The philosophical tension: democracy vs. efficiency
-- The war declaration as the ultimate collective decision
-
-### 7. `docs/lore/glossary.md` — In-World Glossary
-
-| Term | In-World Name | Description |
-|------|---------------|-------------|
-| Tile | Ancient Deed | A plot of land bound to its owner by magical contract |
-| NFT | The Seal | An unbreakable record of land ownership |
-| Gold | Crown Gold | The currency of the realm |
-| Treasury | The Vault | Kingdom's shared wealth |
-| Tax | The Tithe | Portion of earnings given to the kingdom |
-| Farm | Greenhold | Cultivated land that produces gold |
-| Castle | Stronghold | Military fortification |
-| Wall | Bulwark | Defensive barrier |
-| Proposal | Decree | A suggested law or action |
-| Vote | Council Voice | Each landowner's say in governance |
-| War | The Reckoning | Formal military conflict |
-| Quorum | The Gathering | Minimum participation for a valid vote |
-
-### 8. `docs/lore/flavor-text.md` — UI Flavor Text
-
-Short phrases for use throughout the UI:
-
-```
-Loading screen: "The chronicles are being consulted..."
-Connecting wallet: "The ancient seal seeks its owner..."
-Buying land: "You plant your banner and claim this deed."
-Building farm: "The earth yields to your will."
-Building castle: "Stone rises to defend your kingdom."
-Building wall: "A bulwark against the coming storm."
-Claiming gold: "Your lands bear fruit in Crown Gold."
-Proposing: "You raise your voice in the Council."
-Voting: "Your Council Voice echoes through the halls."
-War won: "Victory! The Reckoning favors the bold!"
-War lost: "Defeat. The treasury weeps."
-Tax changed: "The Tithe is adjusted by decree."
-Treasury distributed: "The Vault is opened to the people."
-```
-
-## Writing Style Guidelines
-- **Tone:** Epic but accessible. Think Tolkien meets a well-written video game codex.
-- **Length:** Concise. Each entry should be 1-3 paragraphs, not full essays.
-- **Consistency:** Use established terms from the glossary throughout.
-- **Player connection:** The lore should make players feel like their actions matter.
-- **Humor:** Subtle. A dry wit, not jokes.
-- **Avoid:** Modern slang, pop culture references, anything that breaks immersion.
-
-## Output Structure
-```
-docs/lore/
-├── world-history.md
-├── north-kingdom.md
-├── south-kingdom.md
-├── npc-profiles.md
-├── buildings.md
-├── governance.md
-├── glossary.md
-└── flavor-text.md
-```
-
-## Interface Contracts
-- **Output to Agent 03:** Character descriptions and kingdom aesthetics for art direction
-- **Output to Agent 09:** NPC personalities and speech patterns for AI prompts
-- **Output to Agent 12:** Lore summary for the player guide
-- **Output to Agent 04:** Flavor text for loading screens and UI elements
-- **Output to Agent 14:** Story summary for README
-
-> Make the lore serve the gameplay. Every piece of writing should make the player think: "My next move matters in this world."
+### 5. `docs/lore/in-game-lexicon.md`
+Terminology guide mapping Web3 mechanics into medieval lore (e.g. NFT -> *Sovereign Deed*, Gas -> *Royal Offering*, Testnet ETH -> *Alchemical Silver*).
