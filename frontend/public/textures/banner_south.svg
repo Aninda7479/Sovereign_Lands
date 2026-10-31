@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 256" width="128" height="256">
+  <defs>
+    <linearGradient id="southBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#991b1b" />
+      <stop offset="100%" stop-color="#450a0a" />
+    </linearGradient>
+  </defs>
+  <!-- Banner Body -->
+  <polygon points="4,4 124,4 124,220 64,250 4,220" fill="url(#southBg)" stroke="#f59e0b" stroke-width="4" />
+  <!-- Inner Border -->
+  <polygon points="12,12 116,12 116,212 64,238 12,212" fill="none" stroke="#fcd34d" stroke-width="2" stroke-opacity="0.6" />
+  <!-- Solar Falcon Crest -->
+  <g fill="#fef08a" stroke="#d97706" stroke-width="2">
+    <circle cx="64" cy="75" r="22" fill="#fbbf24" />
+    <polygon points="64,45 68,55 78,55 70,62 73,72 64,66 55,72 58,62 50,55 60,55" fill="#fef08a" />
+    <circle cx="64" cy="75" r="10" fill="#dc2626" />
+  </g>
+  <text x="64" y="160" text-anchor="middle" font-family="serif" font-weight="bold" font-size="14" fill="#fde68a" letter-spacing="2">SOLARA</text>
+  <text x="64" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fca5a5">SOUTH KINGDOM</text>
+</svg>

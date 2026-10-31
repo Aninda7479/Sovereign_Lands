@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 256" width="128" height="256">
+  <defs>
+    <linearGradient id="northBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+  </defs>
+  <!-- Banner Body -->
+  <polygon points="4,4 124,4 124,220 64,250 4,220" fill="url(#northBg)" stroke="#94a3b8" stroke-width="4" />
+  <!-- Inner Border -->
+  <polygon points="12,12 116,12 116,212 64,238 12,212" fill="none" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.6" />
+  <!-- Direwolf / Frost Crest -->
+  <g fill="#e0f2fe" stroke="#0284c7" stroke-width="2">
+    <polygon points="64,40 76,68 104,74 82,94 88,122 64,106 40,122 46,94 24,74 52,68" />
+    <circle cx="64" cy="78" r="8" fill="#38bdf8" />
+  </g>
+  <text x="64" y="160" text-anchor="middle" font-family="serif" font-weight="bold" font-size="14" fill="#cbd5e1" letter-spacing="2">BOREAL</text>
+  <text x="64" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#94a3b8">NORTH KINGDOM</text>
+</svg>
