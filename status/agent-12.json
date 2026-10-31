@@ -1,5 +1,14 @@
 {
   "agentId": "agent-12",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.314Z"
+  "name": "GTA-Style Quest & Mini-Map",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T07:31:00Z",
+  "progress": "Building circular radar mini-map, compass tape, and mission objectives HUD...",
+  "exclusiveFiles": [
+    "frontend/src/components/minimap/RadarMiniMap.tsx",
+    "frontend/src/components/minimap/CompassHeading.tsx",
+    "frontend/src/components/minimap/QuestObjectiveHUD.tsx",
+    "docs/guide/players-field-manual.md",
+    "docs/guide/controls-reference.md"
+  ]
 }
