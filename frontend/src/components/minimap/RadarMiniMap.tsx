@@ -469,8 +469,9 @@ export function RadarMiniMap({
                 stroke={isPlayer ? '#fef08a' : isNorth ? '#38bdf8' : '#f87171'}
                 strokeWidth={isPlayer ? '2' : '1'}
                 className="cursor-pointer transition hover:scale-125"
-                title={`Parcel #${p.id} (${p.kingdom}) - Owner: ${p.owner}`}
-              />
+              >
+                <title>{`Parcel #${p.id} (${p.kingdom}) - Owner: ${p.owner}`}</title>
+              </rect>
             );
           })}
         </svg>

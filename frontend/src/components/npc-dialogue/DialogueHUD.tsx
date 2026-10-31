@@ -13,9 +13,9 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import { getNPCProfileById, NPCProfile } from '../../../ai-system/npc-engine/NPCProfiles';
-import { npcManager } from '../../../ai-system/npc-engine/NPCManager';
-import { keyVault } from '../../../ai-system/providers/KeyVault';
+import { getNPCProfileById, NPCProfile } from '../../../../ai-system/npc-engine/NPCProfiles';
+import { npcManager } from '../../../../ai-system/npc-engine/NPCManager';
+import { keyVault } from '../../../../ai-system/providers/KeyVault';
 
 export interface DialogueHUDProps {
   isOpen: boolean;
@@ -116,7 +116,7 @@ export function DialogueHUD({
 
       // Check if there is already conversation history, otherwise use default greeting
       const history = npcManager.getConversationHistory(npcId);
-      const lastNPCMessage = history.filter((h) => h.role === 'npc').pop();
+      const lastNPCMessage = history.filter((h: any) => h.role === 'npc').pop();
       const greeting = lastNPCMessage ? lastNPCMessage.content : loadedProfile.defaultDialogue;
 
       startTypewriter(greeting);
@@ -344,7 +344,7 @@ export function DialogueHUD({
             <div className="space-y-3 pt-1 border-t border-zinc-800/80">
               {/* Quick Choices Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {profile.quickChoices.map((choice, idx) => (
+                {profile.quickChoices.map((choice: any, idx: number) => (
                   <button
                     key={choice.id}
                     onClick={() => handleSendMessage(choice.prompt)}

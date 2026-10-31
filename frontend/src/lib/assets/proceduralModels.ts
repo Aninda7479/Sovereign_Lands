@@ -71,11 +71,11 @@ export const PALETTE = {
 //                             HELPER UTILS
 // =============================================================================
 
-function createMat(color: number, roughness = 0.8, metallic = 0.1, emissive = 0x000000): THREE.MeshStandardMaterial {
+function createMat(color: number, roughness = 0.8, metalness = 0.1, emissive = 0x000000): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
     color,
     roughness,
-    metallic,
+    metalness,
     emissive,
     flatShading: true,
   });

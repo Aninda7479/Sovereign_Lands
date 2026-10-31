@@ -219,14 +219,15 @@ export function useKingdomTreasury() {
 
   // Trigger Deterministic War
   const declareWar = useCallback(
-    async (attackerKingdom: 1 | 2) => {
+    async (attackerKingdom: 1 | 2 | 'North' | 'South') => {
       try {
+        const kingdomId = attackerKingdom === 1 || attackerKingdom === 'North' ? 1 : 2;
         if (isConnected) {
           await writeContractAsync({
             address: contractAddress,
             abi: SOVEREIGN_LANDS_ABI,
             functionName: 'resolveWar',
-            args: [attackerKingdom],
+            args: [kingdomId],
           });
           refetchNorth();
           refetchSouth();

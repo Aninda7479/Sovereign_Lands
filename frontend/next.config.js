@@ -9,10 +9,29 @@ const nextConfig = {
   ],
   webpack: (config) => {
     config.externals = [...(config.externals || []), { canvas: 'canvas' }];
+    config.resolve.fallback = {
+      ...(config.resolve.fallback || {}),
+      '@x402/evm/upto/client': false,
+      '@x402/evm/exact/client': false,
+      '@x402/core/client': false,
+      '@x402/svm/exact/client': false,
+      '@x402/evm': false,
+      fs: false,
+      net: false,
+      tls: false,
+    };
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      '@x402/evm/upto/client': false,
+      '@x402/evm/exact/client': false,
+      '@x402/core/client': false,
+      '@x402/svm/exact/client': false,
+      '@x402/evm': false,
+    };
     config.module.rules.push({
       test: /\.(glsl|vs|fs|vert|frag)$/,
       exclude: /node_modules/,
-      use: ['raw-loader', 'glslify-loader'],
+      type: 'asset/source',
     });
     return config;
   },

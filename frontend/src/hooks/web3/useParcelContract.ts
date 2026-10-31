@@ -96,22 +96,24 @@ const MOCK_DEFAULT_PARCELS: ParcelEntity[] = [
 
 export interface UseParcelContractReturn {
   parcels: ParcelEntity[];
+  allParcels: ParcelEntity[];
   playerGold: number;
   pendingGold: { totalGross: number; totalTax: number; totalNet: number };
   playerParcels: ParcelEntity[];
   isContractLoading: boolean;
   isTransacting: boolean;
   txHash: `0x${string}` | null;
-  buyParcel: (parcelId: number) => Promise<void>;
+  buyParcel: (parcelId: number) => Promise<`0x${string}` | void>;
   buyParcelWithBounds: (
     parcelId: number,
     minX: number,
     minZ: number,
     maxX: number,
     maxZ: number
-  ) => Promise<void>;
-  buildStructure: (parcelId: number, structureType: number) => Promise<void>;
-  claimGold: () => Promise<void>;
+  ) => Promise<`0x${string}` | void>;
+  buildStructure: (parcelId: number, structureType: number) => Promise<`0x${string}` | void>;
+  constructStructure: (parcelId: number, structureType: number) => Promise<`0x${string}` | void>;
+  claimGold: (parcelId?: number) => Promise<`0x${string}` | void>;
   refetchParcels: () => void;
 }
 
@@ -234,6 +236,7 @@ export function useParcelContract(): UseParcelContractReturn {
             refetchParcels();
             refetchGold();
           }, 2000);
+          return hash;
         } else {
           // Mock Sandbox Purchase
           setParcels((prev) =>
@@ -242,6 +245,7 @@ export function useParcelContract(): UseParcelContractReturn {
             )
           );
           setLocalGold((g) => g + 100);
+          return '0xSandboxLocalClaim' as `0x${string}`;
         }
       } catch (err) {
         console.error('buyParcel error:', err);
@@ -271,6 +275,7 @@ export function useParcelContract(): UseParcelContractReturn {
             refetchParcels();
             refetchGold();
           }, 2000);
+          return hash;
         } else {
           const kingdom = (minZ + maxZ) / 2 < 0 ? 'North' : 'South';
           setParcels((prev) => [
@@ -284,6 +289,7 @@ export function useParcelContract(): UseParcelContractReturn {
             },
           ]);
           setLocalGold((g) => g + 100);
+          return '0xSandboxLocalClaim' as `0x${string}`;
         }
       } catch (err) {
         console.error('buyParcelWithBounds error:', err);
@@ -312,11 +318,13 @@ export function useParcelContract(): UseParcelContractReturn {
             refetchParcels();
             refetchGold();
           }, 2000);
+          return hash;
         } else {
           setParcels((prev) =>
             prev.map((p) => (p.id === parcelId ? { ...p, structure: structureType } : p))
           );
           setLocalGold((g) => Math.max(0, g - 50));
+          return '0xSandboxLocalBuild' as `0x${string}`;
         }
       } catch (err) {
         console.error('buildStructure error:', err);
@@ -329,7 +337,7 @@ export function useParcelContract(): UseParcelContractReturn {
   );
 
   // Transaction: Claim Gold & Tithe
-  const claimGold = useCallback(async () => {
+  const claimGold = useCallback(async (_parcelId?: number) => {
     setIsTransacting(true);
     try {
       if (isConnected) {
@@ -342,8 +350,10 @@ export function useParcelContract(): UseParcelContractReturn {
         setTimeout(() => {
           refetchGold();
         }, 2000);
+        return hash;
       } else {
         setLocalGold((g) => g + pendingGold.totalNet);
+        return '0xSandboxLocalHarvest' as `0x${string}`;
       }
     } catch (err) {
       console.error('claimGold error:', err);
@@ -355,6 +365,7 @@ export function useParcelContract(): UseParcelContractReturn {
 
   return {
     parcels,
+    allParcels: parcels,
     playerGold,
     pendingGold,
     playerParcels,
@@ -364,6 +375,7 @@ export function useParcelContract(): UseParcelContractReturn {
     buyParcel,
     buyParcelWithBounds,
     buildStructure,
+    constructStructure: buildStructure,
     claimGold,
     refetchParcels,
   };

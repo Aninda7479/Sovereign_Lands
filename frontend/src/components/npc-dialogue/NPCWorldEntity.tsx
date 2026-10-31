@@ -4,8 +4,8 @@ import React, { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { NPCProfile } from '../../../ai-system/npc-engine/NPCProfiles';
-import { npcManager } from '../../../ai-system/npc-engine/NPCManager';
+import { NPCProfile } from '../../../../ai-system/npc-engine/NPCProfiles';
+import { npcManager } from '../../../../ai-system/npc-engine/NPCManager';
 import {
   createNPCFarmerMesh,
   createNPCKnightMesh,

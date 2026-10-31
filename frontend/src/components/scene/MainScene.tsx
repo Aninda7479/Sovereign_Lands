@@ -79,6 +79,7 @@ export interface MainSceneProps {
   selectedParcelId?: number | null;
   onSelectParcel?: (parcel: ParcelEntity) => void;
   initialPlayerPosition?: [number, number, number];
+  playerPosition?: [number, number, number];
   onPlayerPositionChange?: (position: [number, number, number]) => void;
   onCameraYawChange?: (yaw: number) => void;
   onParcelAction?: (action: 'interact' | 'build' | 'buy') => void;
@@ -107,6 +108,7 @@ export function MainScene({
   selectedParcelId,
   onSelectParcel,
   initialPlayerPosition = [0, 2.0, 0],
+  playerPosition: propPlayerPosition,
   onPlayerPositionChange,
   onCameraYawChange,
   onParcelAction,
@@ -154,13 +156,14 @@ export function MainScene({
   const effectiveActiveNpc = activeNpcDialogue ?? gameState.activeNpcDialogue ?? null;
 
   // Local state tracking for player position
-  const [playerPosition, setPlayerPosition] = useState<[number, number, number]>(
-    initialPlayerPosition
+  const [localPlayerPosition, setLocalPlayerPosition] = useState<[number, number, number]>(
+    propPlayerPosition ?? initialPlayerPosition
   );
+  const playerPosition: [number, number, number] = propPlayerPosition ?? localPlayerPosition;
 
   const handlePositionChange = useCallback(
     (newPos: [number, number, number]) => {
-      setPlayerPosition(newPos);
+      setLocalPlayerPosition(newPos);
       onPlayerPositionChange?.(newPos);
       if (gameState.setPlayerPosition) {
         gameState.setPlayerPosition(newPos);

@@ -28,11 +28,11 @@ import {
   WarPredictionOutcome,
   TerritoryBreakdown,
   COMBAT_CONSTANTS,
-} from '../../../ai-system/strategy/WarSimulator3D';
+} from '../../../../ai-system/strategy/WarSimulator3D';
 import {
   tacticalAdvisor,
   StrategicBriefing,
-} from '../../../ai-system/strategy/TacticalAdvisor';
+} from '../../../../ai-system/strategy/TacticalAdvisor';
 
 export interface TacticalOverlayHUDProps {
   isOpen: boolean;
@@ -377,7 +377,7 @@ export function TacticalOverlayHUD({
                   </text>
 
                   {/* Registered Parcels Rendering */}
-                  {allParcels.map((parcel) => {
+                  {allParcels.map((parcel: any) => {
                     const b = parcel.bounds;
                     const width = Math.max(20, b.maxX - b.minX);
                     const height = Math.max(20, b.maxZ - b.minZ);
@@ -428,7 +428,7 @@ export function TacticalOverlayHUD({
                       Parcel #{selectedParcelId}
                     </span>
                     {(() => {
-                      const p = allParcels.find((item) => item.id === selectedParcelId);
+                      const p = allParcels.find((item: any) => item.id === selectedParcelId);
                       if (!p) return null;
                       const structureNames = ['Unbuilt', 'Farmstead', 'Guard Tower', 'Stone Wall', 'Castle Keep'];
                       return (

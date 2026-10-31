@@ -95,7 +95,6 @@ export function WarTableEntity({
         e.stopPropagation();
         onOpenWarTable?.();
       }}
-      className="cursor-pointer"
     >
       {/* ========================================================================= */}
       {/*                         CARVED OAK WAR TABLE                              */}
