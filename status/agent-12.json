@@ -1,9 +1,10 @@
 {
   "agentId": "agent-12",
   "name": "GTA-Style Quest & Mini-Map",
-  "status": "UNDER_CONSTRUCTION",
+  "status": "READY",
   "startedAt": "2026-10-31T07:31:00Z",
-  "progress": "Building circular radar mini-map, compass tape, and mission objectives HUD...",
+  "completedAt": "2026-10-31T07:38:00Z",
+  "progress": "All deliverables complete: RadarMiniMap 3D circular radar HUD with camera heading rotation, dynamic terrain/river/bridge, citadel and NPC blips, and edge clamping; CompassHeading minimalist top-center bearing ribbon with cardinal indicators and horizon POI markers; QuestObjectiveHUD GTA-style 3-mission onboarding sequence with keybindings and Web Audio fanfare; players-field-manual.md; and controls-reference.md.",
   "exclusiveFiles": [
     "frontend/src/components/minimap/RadarMiniMap.tsx",
     "frontend/src/components/minimap/CompassHeading.tsx",
