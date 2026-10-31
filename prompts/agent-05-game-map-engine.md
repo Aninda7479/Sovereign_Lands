@@ -30,10 +30,17 @@ To enable 100% safe parallel execution alongside 15 other concurrent coding agen
    You are strictly permitted to create or modify ONLY the files listed in `exclusiveFiles`.
    ⚠️ **DO NOT TOUCH** `frontend/src/components/canvas/**` (Agent 04), `frontend/src/components/world/**` (Agent 06), or `frontend/src/app/**`.
 
-3. **PARALLEL INDEPENDENCE (STUB RULE)**:
+3. **ATOMIC GIT COMMIT & ONLINE SYNC (MANDATORY AFTER EVERY FILE/TASK)**:
+   After creating or editing any file in your jurisdiction, you MUST immediately record a commit and push it online to GitHub:
+   ```bash
+   node scripts/agent-git.js agent-05 "Created or updated [filename]" [filepath]
+   ```
+   *Note: This script safely handles concurrent git locks, rebases with parallel agents, and pushes directly to GitHub so any file can be rolled back if an error occurs.*
+
+4. **PARALLEL INDEPENDENCE (STUB RULE)**:
    If 3D models from Agent 03 are still building, use a temporary low-poly humanoid capsule mesh with colored joints so you can develop and test movement independently.
 
-4. **RELEASE LOCK ON COMPLETION**:
+5. **RELEASE LOCK ON COMPLETION**:
    - Delete `status/agent-05.lock`
    - Update `status/agent-05.json` with `"status": "READY"`.
 ---

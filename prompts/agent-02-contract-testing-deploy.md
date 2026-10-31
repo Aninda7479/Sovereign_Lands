@@ -39,10 +39,17 @@ To enable 100% safe parallel execution alongside 15 other concurrent coding agen
    - `status/agent-02.lock`
    ⚠️ **DO NOT TOUCH** `contracts/src/**` (Agent 01 owns contracts) or `frontend/**`.
 
-3. **PARALLEL INDEPENDENCE (STUB RULE)**:
+3. **ATOMIC GIT COMMIT & ONLINE SYNC (MANDATORY AFTER EVERY FILE/TASK)**:
+   After creating or editing any file in your jurisdiction, you MUST immediately record a commit and push it online to GitHub:
+   ```bash
+   node scripts/agent-git.js agent-02 "Created or updated [filename]" [filepath]
+   ```
+   *Note: This script safely handles concurrent git locks, rebases with parallel agents, and pushes directly to GitHub so any file can be rolled back if an error occurs.*
+
+4. **PARALLEL INDEPENDENCE (STUB RULE)**:
    If Agent 01 has not finished writing `contracts/src/SovereignLands.sol` when you start, create a minimal mock contract in your test file or compile against the interface `contracts/src/ISovereignLands.sol`.
 
-4. **RELEASE LOCK ON COMPLETION**:
+5. **RELEASE LOCK ON COMPLETION**:
    - Delete `status/agent-02.lock`
    - Update `status/agent-02.json` with `"status": "READY"`.
 ---

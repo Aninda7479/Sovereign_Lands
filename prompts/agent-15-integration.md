@@ -29,10 +29,17 @@ To enable 100% safe parallel execution alongside 15 other concurrent coding agen
    You are strictly permitted to create or modify ONLY the files in `exclusiveFiles`.
    ⚠️ **DO NOT TOUCH** individual module components (Agents 04-12 own their components). You import them and wire them into the live scene.
 
-3. **PARALLEL INDEPENDENCE (UNDER-CONSTRUCTION SHIELD)**:
+3. **ATOMIC GIT COMMIT & ONLINE SYNC (MANDATORY AFTER EVERY FILE/TASK)**:
+   After creating or editing any file in your jurisdiction, you MUST immediately record a commit and push it online to GitHub:
+   ```bash
+   node scripts/agent-git.js agent-15 "Created or updated [filename]" [filepath]
+   ```
+   *Note: This script safely handles concurrent git locks, rebases with parallel agents, and pushes directly to GitHub so any file can be rolled back if an error occurs.*
+
+4. **PARALLEL INDEPENDENCE (UNDER-CONSTRUCTION SHIELD)**:
    When assembling `MainScene.tsx` and `page.tsx`, check `status/agent-XX.json` for each module. If an agent is not yet `"status": "READY"`, render the module inside a safe `<Suspense fallback={<UnderConstruction moduleName="..." agentId="..." />}>` wrapper so the build NEVER fails!
 
-4. **RELEASE LOCK ON COMPLETION**:
+5. **RELEASE LOCK ON COMPLETION**:
    - Delete `status/agent-15.lock`
    - Update `status/agent-15.json` with `"status": "READY"`.
 ---

@@ -30,7 +30,14 @@ To enable 100% safe parallel execution alongside 15 other concurrent coding agen
    You are strictly permitted to create or modify ONLY the files in `exclusiveFiles`.
    ⚠️ **DO NOT TOUCH** `frontend/src/components/canvas/**` or `frontend/src/app/**`.
 
-3. **RELEASE LOCK ON COMPLETION**:
+3. **ATOMIC GIT COMMIT & ONLINE SYNC (MANDATORY AFTER EVERY FILE/TASK)**:
+   After creating or editing any file in your jurisdiction, you MUST immediately record a commit and push it online to GitHub:
+   ```bash
+   node scripts/agent-git.js agent-12 "Created or updated [filename]" [filepath]
+   ```
+   *Note: This script safely handles concurrent git locks, rebases with parallel agents, and pushes directly to GitHub so any file can be rolled back if an error occurs.*
+
+4. **RELEASE LOCK ON COMPLETION**:
    - Delete `status/agent-12.lock`
    - Update `status/agent-12.json` with `"status": "READY"`.
 ---

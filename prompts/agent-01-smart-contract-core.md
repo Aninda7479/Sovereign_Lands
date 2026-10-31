@@ -33,7 +33,14 @@ To enable 100% safe parallel execution alongside 15 other concurrent coding agen
    - `status/agent-01.lock`
    ⚠️ **DO NOT TOUCH** `contracts/foundry.toml`, `contracts/test/**`, `contracts/script/**`, or `frontend/**`. Agent 02 owns deployment/tests, and Agent 07/15 own frontend Web3.
 
-3. **RELEASE LOCK ON COMPLETION**:
+3. **ATOMIC GIT COMMIT & ONLINE SYNC (MANDATORY AFTER EVERY FILE/TASK)**:
+   After creating or editing any file in your jurisdiction, you MUST immediately record a commit and push it online to GitHub:
+   ```bash
+   node scripts/agent-git.js agent-01 "Created or updated [filename]" [filepath]
+   ```
+   *Note: This script safely handles concurrent git locks, rebases with parallel agents, and pushes directly to GitHub so any file can be rolled back if an error occurs.*
+
+4. **RELEASE LOCK ON COMPLETION**:
    When your deliverables are finished and verified:
    - Delete `status/agent-01.lock`
    - Update `status/agent-01.json` with:

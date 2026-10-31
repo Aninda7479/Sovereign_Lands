@@ -27,7 +27,14 @@ To enable 100% safe parallel execution alongside 15 other concurrent coding agen
 2. **EXCLUSIVE FILE JURISDICTION (STRICT BOUNDARY)**:
    You are strictly permitted to create or modify ONLY files in `docs/qa/**` and apply verified bug-fix patches to existing files if any runtime crash is identified.
 
-3. **RELEASE LOCK ON COMPLETION**:
+3. **ATOMIC GIT COMMIT & ONLINE SYNC (MANDATORY AFTER EVERY FILE/TASK)**:
+   After creating or editing any file in your jurisdiction, you MUST immediately record a commit and push it online to GitHub:
+   ```bash
+   node scripts/agent-git.js agent-16 "Created or updated [filename]" [filepath]
+   ```
+   *Note: This script safely handles concurrent git locks, rebases with parallel agents, and pushes directly to GitHub so any file can be rolled back if an error occurs.*
+
+4. **RELEASE LOCK ON COMPLETION**:
    - Delete `status/agent-16.lock`
    - Update `status/agent-16.json` with `"status": "READY"`.
 ---
