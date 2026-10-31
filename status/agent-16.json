@@ -1,5 +1,12 @@
 {
   "agentId": "agent-16",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.315Z"
+  "name": "3D QA, 60 FPS Optimization & Launch",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T06:00:00Z",
+  "progress": "Running 3D collision audits, FPS profiling, and launch checklist...",
+  "exclusiveFiles": [
+    "docs/qa/3d-playtest-report.md",
+    "docs/qa/webgl-fps-benchmark.md",
+    "docs/qa/launch-readiness-checklist.md"
+  ]
 }
