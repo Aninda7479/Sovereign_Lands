@@ -17,9 +17,11 @@ import { NPCWorldEntity as BaseNPCWorldEntity } from '@/components/npc-dialogue/
 import {
   NPC_PROFILES,
   getNPCProfileById,
+  getAllNPCProfiles,
   NPCProfile,
   NPCId,
 } from '../../../../ai-system/npc-engine/NPCProfiles';
+import { WorldSettlements } from '@/components/world/WorldSettlements';
 import { WarTableEntity } from '@/components/tactical-map/WarTableEntity';
 import { ParcelEntity, snapToGrid, getTerrainHeight } from '@/lib/world/parcelCoordinates';
 import { StructureTypeEnum } from '@/lib/assets/modelRegistry';
@@ -95,6 +97,7 @@ export interface MainSceneProps {
   isBuildValid?: boolean;
   playerFaction?: 'north' | 'south' | 'neutral';
   isPointerLockDisabled?: boolean;
+  graphicsQuality?: 'low' | 'medium' | 'high';
 }
 
 /**
@@ -125,6 +128,7 @@ export function MainScene({
   isBuildValid = true,
   playerFaction = 'north',
   isPointerLockDisabled = false,
+  graphicsQuality = 'medium',
 }: MainSceneProps) {
   // Attempt to read GameProvider context (gracefully fallback if rendered standalone)
   let gameState: Partial<GameStateContextType> = {};
@@ -213,7 +217,11 @@ export function MainScene({
     <>
       {/* Dynamic Atmospheric Scene Lighting */}
       {showLighting && (
-        <SceneLighting timeOfDay={effectiveTimeOfDay} enableShadows />
+        <SceneLighting
+          timeOfDay={effectiveTimeOfDay}
+          enableShadows={graphicsQuality !== 'low'}
+          shadowResolution={graphicsQuality === 'high' ? 1024 : 512}
+        />
       )}
 
       {/* Sovereign Rapier Physics World */}
@@ -258,19 +266,20 @@ export function MainScene({
         {/* Real-Time Multiplayer Remote Players */}
         <RemotePlayersList />
 
-        {/* Roaming AI NPCs */}
-        <NPCWorldEntity
-          npcId="aldric"
-          playerPosition={playerPosition}
-          onInteract={handleInteractNPC}
-          isConversingWithThisNPC={effectiveActiveNpc === 'aldric'}
-        />
-        <NPCWorldEntity
-          npcId="gareth"
-          playerPosition={playerPosition}
-          onInteract={handleInteractNPC}
-          isConversingWithThisNPC={effectiveActiveNpc === 'gareth'}
-        />
+        {/* Living Medieval Settlements, Houses, Central Park, Fountains & Mountain Ranges */}
+        <WorldSettlements />
+
+        {/* Roaming Living AI NPCs */}
+        {getAllNPCProfiles().map((profile) => (
+          <NPCWorldEntity
+            key={profile.id}
+            npcId={profile.id}
+            profile={profile}
+            playerPosition={playerPosition}
+            onInteract={handleInteractNPC}
+            isConversingWithThisNPC={effectiveActiveNpc === profile.id}
+          />
+        ))}
 
         {/* Citadel Strategic War Table */}
         <WarTableEntity

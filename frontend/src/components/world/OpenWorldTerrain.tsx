@@ -127,7 +127,21 @@ export function OpenWorldTerrain({
       }
     }
 
-    return items;
+    // Pre-create 3D model primitives once in memory to avoid garbage collection stutter
+    return items.map((item) => {
+      let meshObj: THREE.Object3D;
+      if (item.type === 'pine') {
+        meshObj = createTreeModel('pine');
+      } else if (item.type === 'oak') {
+        meshObj = createTreeModel('oak');
+      } else {
+        meshObj = createRockModel(item.scale);
+      }
+      return {
+        ...item,
+        model: meshObj,
+      };
+    });
   }, []);
 
   return (
@@ -147,26 +161,15 @@ export function OpenWorldTerrain({
 
       {/* Decorative Environmental Foliage */}
       <group name="TerrainFoliage">
-        {foliageInstances.map((item, idx) => {
-          let meshObj: THREE.Object3D;
-          if (item.type === 'pine') {
-            meshObj = createTreeModel('pine');
-          } else if (item.type === 'oak') {
-            meshObj = createTreeModel('oak');
-          } else {
-            meshObj = createRockModel(item.scale);
-          }
-
-          return (
-            <group
-              key={`foliage_${idx}`}
-              position={item.pos}
-              scale={[item.scale, item.scale, item.scale]}
-            >
-              <primitive object={meshObj} />
-            </group>
-          );
-        })}
+        {foliageInstances.map((item, idx) => (
+          <group
+            key={`foliage_${idx}`}
+            position={item.pos}
+            scale={[item.scale, item.scale, item.scale]}
+          >
+            <primitive object={item.model} />
+          </group>
+        ))}
       </group>
     </group>
   );

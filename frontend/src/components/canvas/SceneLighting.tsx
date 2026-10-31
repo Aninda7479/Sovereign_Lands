@@ -6,16 +6,18 @@ import * as THREE from 'three';
 export interface SceneLightingProps {
   timeOfDay?: 'day' | 'sunset' | 'night';
   enableShadows?: boolean;
+  shadowResolution?: number;
 }
 
 /**
  * Atmospheric open-world lighting component for Sovereign Lands:
- * Directional sunlight with shadow cascades, soft ambient fill, hemisphere lighting,
+ * Directional sunlight with optimized shadow cascades, soft ambient fill, hemisphere lighting,
  * and point lights for torches.
  */
 export function SceneLighting({
   timeOfDay = 'day',
   enableShadows = true,
+  shadowResolution = 1024,
 }: SceneLightingProps) {
   const dirLightRef = useRef<THREE.DirectionalLight>(null);
 
@@ -83,8 +85,8 @@ export function SceneLighting({
         color={config.sunColor}
         intensity={config.sunIntensity}
         castShadow={enableShadows}
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={shadowResolution}
+        shadow-mapSize-height={shadowResolution}
         shadow-camera-near={1.0}
         shadow-camera-far={600}
         shadow-camera-left={-200}

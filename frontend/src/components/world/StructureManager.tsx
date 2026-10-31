@@ -65,9 +65,12 @@ export function StructureManager({
       });
   }, [parcels]);
 
-  // View-distance LOD filtering relative to player
+  // View-distance LOD filtering: only filter if there are many structures (>25)
+  // to avoid recreating physics RigidBodies on minor player movements
   const visibleStructures = useMemo(() => {
-    if (!playerPosition) return activeStructures;
+    if (activeStructures.length <= 25 || !playerPosition) {
+      return activeStructures;
+    }
     const px = Array.isArray(playerPosition) ? playerPosition[0] : (playerPosition as any).x;
     const pz = Array.isArray(playerPosition) ? playerPosition[2] : (playerPosition as any).z;
 

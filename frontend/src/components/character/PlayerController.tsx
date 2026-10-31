@@ -60,6 +60,7 @@ export function PlayerController({
   const cameraYawRef = useRef(0);
   const currentRotationY = useRef(initialRotation);
   const lastEmitPos = useRef(new THREE.Vector3());
+  const lastEmitTime = useRef(0);
 
   // Listen to single-press action triggers
   useEffect(() => {
@@ -130,8 +131,27 @@ export function PlayerController({
     // Apply computed velocity to dynamic capsule
     rb.setLinvel({ x: targetVelX, y: targetVelY, z: targetVelZ }, true);
 
-    // 4. Notify position listeners periodically (if moved more than 0.1m)
-    if (currentPos.distanceTo(lastEmitPos.current) > 0.1) {
+    // 4. Notify position listeners with smart throttling to prevent React reconciliation lag
+    const distFromLastEmit = currentPos.distanceTo(lastEmitPos.current);
+    const now = performance.now();
+
+    // High-frequency vanilla DOM broadcast for minimap & compass (0ms React lag)
+    if (distFromLastEmit > 0.25) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('sovereign-player-move', {
+            detail: [currentPos.x, currentPos.y, currentPos.z],
+          })
+        );
+      }
+    }
+
+    // Throttle React state tree updates to at most once every 300ms, or when stopping
+    if (
+      (now - lastEmitTime.current > 300 && distFromLastEmit > 1.2) ||
+      (!hasInput && distFromLastEmit > 0.4)
+    ) {
+      lastEmitTime.current = now;
       lastEmitPos.current.copy(currentPos);
       onPositionChange?.([currentPos.x, currentPos.y, currentPos.z]);
     }

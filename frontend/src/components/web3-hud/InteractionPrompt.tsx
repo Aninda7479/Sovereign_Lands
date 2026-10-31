@@ -2,11 +2,13 @@
 
 import React from 'react';
 
-export type PromptActionType = 'buy' | 'harvest' | 'council' | 'build';
+export type PromptActionType = 'buy' | 'harvest' | 'council' | 'build' | 'npc';
 
 export interface InteractionPromptProps {
   actionType: PromptActionType | null;
   parcelId?: number;
+  npcName?: string;
+  npcRole?: string;
   goldReward?: number;
   priceEth?: string;
   onTrigger?: () => void;
@@ -23,6 +25,8 @@ export interface InteractionPromptProps {
 export function InteractionPrompt({
   actionType,
   parcelId,
+  npcName,
+  npcRole,
   goldReward = 25,
   priceEth = '0.01',
   onTrigger,
@@ -30,6 +34,13 @@ export function InteractionPrompt({
   if (!actionType) return null;
 
   const config = {
+    npc: {
+      key: 'E',
+      title: npcName ? `Speak with ${npcName}` : 'Speak with Resident',
+      subtitle: npcRole || 'Press E or Click to interact',
+      color: 'border-amber-400/90 bg-zinc-950/90 text-amber-200',
+      badge: 'bg-amber-500/30 text-amber-300 border-amber-400/80',
+    },
     buy: {
       key: 'B',
       title: 'Claim Frontier Territory',
@@ -54,7 +65,7 @@ export function InteractionPrompt({
     build: {
       key: 'C',
       title: 'In-World Construction',
-      subtitle: 'Construct Walls, Towers, or Castle Keep',
+      subtitle: 'Construct Houses, Fountains, or Fortresses',
       color: 'border-purple-400/80 bg-purple-950/80 text-purple-200',
       badge: 'bg-purple-500/20 text-purple-300 border-purple-400/50',
     },

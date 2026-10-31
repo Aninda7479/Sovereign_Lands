@@ -110,6 +110,96 @@ const STATIC_BLIPS: BlipInfo[] = [
     color: '#fbbf24', // amber-400
     badge: '💰',
   },
+  {
+    id: 'sovereign_park',
+    label: 'Sovereign Central Park',
+    role: 'Botanical Gardens & Royal Fountain',
+    worldX: 34,
+    worldZ: -46,
+    type: 'quest',
+    color: '#34d399', // emerald-400
+    badge: '⛲',
+  },
+  {
+    id: 'north_village',
+    label: 'Northern Thatched Village',
+    role: 'Village Square & Crafting District',
+    worldX: -50,
+    worldZ: -95,
+    type: 'parcel',
+    color: '#f59e0b', // amber-500
+    badge: '🏘️',
+  },
+  {
+    id: 'npc_eleanor',
+    label: 'Lady Eleanor',
+    role: 'Royal Park Botanist',
+    worldX: 34,
+    worldZ: -42,
+    type: 'npc',
+    color: '#10b981', // emerald-500
+    badge: '🌸',
+  },
+  {
+    id: 'npc_torvald',
+    label: 'Torvald',
+    role: 'Master Blacksmith',
+    worldX: -22,
+    worldZ: -120,
+    type: 'npc',
+    color: '#f97316', // orange-500
+    badge: '⚒️',
+  },
+  {
+    id: 'npc_lyra',
+    label: 'Lyra',
+    role: 'Wandering Minstrel',
+    worldX: -46,
+    worldZ: -94,
+    type: 'npc',
+    color: '#ec4899', // pink-500
+    badge: '🪕',
+  },
+  {
+    id: 'npc_cedric',
+    label: 'Cedric',
+    role: 'Guild Merchant',
+    worldX: -56,
+    worldZ: -114,
+    type: 'npc',
+    color: '#eab308', // yellow-500
+    badge: '📦',
+  },
+  {
+    id: 'npc_beatrice',
+    label: 'Sister Beatrice',
+    role: 'Sanctuary Healer',
+    worldX: -80,
+    worldZ: -132,
+    type: 'npc',
+    color: '#6366f1', // indigo-500
+    badge: '✨',
+  },
+  {
+    id: 'npc_kaelen',
+    label: 'Kaelen',
+    role: 'Mountain Ranger',
+    worldX: -112,
+    worldZ: -62,
+    type: 'npc',
+    color: '#78716c', // stone-500
+    badge: '🏹',
+  },
+  {
+    id: 'south_district',
+    label: 'Solara Riverside Settlement',
+    role: 'Southern Trading District & Fountain',
+    worldX: -30,
+    worldZ: 90,
+    type: 'parcel',
+    color: '#ef4444', // red-500
+    badge: '🏛️',
+  },
 ];
 
 // Sample frontier parcel clusters

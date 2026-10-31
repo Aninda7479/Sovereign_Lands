@@ -15,12 +15,13 @@ export interface GameCanvasProps {
   className?: string;
   cameraPosition?: [number, number, number];
   cameraFov?: number;
+  graphicsQuality?: 'low' | 'medium' | 'high';
 }
 
 /**
  * Full-viewport 3D WebGL Canvas for Sovereign Lands.
- * Configured with WebGL 2, PCFSoftShadowMap, ACESFilmic tone mapping,
- * devicePixelRatio clamp, and Suspense loading fallback.
+ * Configured for high FPS with adaptive DPR clamp, optimized ACESFilmic tone mapping,
+ * and scalable graphics quality presets.
  */
 export function GameCanvas({
   children,
@@ -30,16 +31,26 @@ export function GameCanvas({
   className = '',
   cameraPosition = [0, 8, 14],
   cameraFov = 60,
+  graphicsQuality = 'medium',
 }: GameCanvasProps) {
+  // Adaptive resolution scaling
+  const effectiveDpr: number | [number, number] =
+    graphicsQuality === 'high' ? [1, 1.25] : 1;
+
+  const effectiveShadows =
+    graphicsQuality === 'low'
+      ? false
+      : graphicsQuality === 'medium'
+      ? { type: THREE.BasicShadowMap }
+      : { type: THREE.PCFSoftShadowMap };
+
   return (
     <div className={`game-viewport relative w-screen h-screen overflow-hidden bg-slate-950 ${className}`}>
       <Canvas
-        shadows={{
-          type: THREE.PCFSoftShadowMap,
-        }}
-        dpr={[1, 2]} // Clamps device pixel ratio to 2 for crisp 60 FPS on Retina displays
+        shadows={effectiveShadows}
+        dpr={effectiveDpr} // Capped at 1.0 (or 1.25 on High) to prevent GPU fillrate lag on high-DPI screens
         gl={{
-          antialias: true,
+          antialias: graphicsQuality !== 'low',
           powerPreference: 'high-performance',
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.1,
@@ -50,7 +61,7 @@ export function GameCanvas({
           position: cameraPosition,
           fov: cameraFov,
           near: 0.1,
-          far: 1000,
+          far: 800,
         }}
         style={{
           width: '100%',
@@ -61,7 +72,12 @@ export function GameCanvas({
         }}
       >
         <Suspense fallback={null}>
-          {showLighting && <SceneLighting timeOfDay={timeOfDay} enableShadows={enableShadows} />}
+          {showLighting && (
+            <SceneLighting
+              timeOfDay={timeOfDay}
+              enableShadows={enableShadows && graphicsQuality !== 'low'}
+            />
+          )}
           {children}
         </Suspense>
       </Canvas>

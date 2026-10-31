@@ -3,6 +3,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { getTerrainHeight } from '@/lib/world/parcelCoordinates';
 
 export interface ThirdPersonCameraProps {
   targetPosition: THREE.Vector3;
@@ -16,9 +17,9 @@ export interface ThirdPersonCameraProps {
 }
 
 /**
- * GTA-style over-the-shoulder orbit follow camera.
- * Smoothly tracks the player character, responds to mouse orbit, performs raycast collision avoidance,
- * and dynamically shifts FOV during sprint.
+ * High-Performance GTA-style over-the-shoulder orbit follow camera.
+ * Optimized for silky 60 FPS: uses O(1) mathematical terrain clearance instead of
+ * expensive recursive scene raycasting, and decouples mouse look from React re-renders.
  */
 export function ThirdPersonCamera({
   targetPosition,
@@ -30,7 +31,7 @@ export function ThirdPersonCamera({
   isPointerLockDisabled = false,
   onCameraYawChange,
 }: ThirdPersonCameraProps) {
-  const { camera, gl, scene } = useThree();
+  const { camera, gl } = useThree();
 
   const yaw = useRef(0);
   const pitch = useRef(0.25); // Slight top-down angle
@@ -38,10 +39,10 @@ export function ThirdPersonCamera({
   const isPointerLocked = useRef(false);
   const isMouseDown = useRef(false);
   const previousMousePosition = useRef({ x: 0, y: 0 });
+  const lastYawEmitTime = useRef(0);
 
   const currentCamPos = useRef(new THREE.Vector3(0, 5, 10));
   const currentLookAt = useRef(new THREE.Vector3(0, 1.4, 0));
-  const raycaster = useRef(new THREE.Raycaster());
 
   // Release pointer lock immediately if pointer lock is disabled (e.g. pause/settings menu open)
   useEffect(() => {
@@ -83,14 +84,11 @@ export function ThirdPersonCamera({
     const handleMouseMove = (e: MouseEvent) => {
       if (isPointerLockDisabled) return;
 
+      let moved = false;
       if (isPointerLocked.current) {
         yaw.current -= e.movementX * sensitivity;
         pitch.current -= e.movementY * sensitivity;
-
-        // Clamp pitch so camera cannot flip upside down or clip under feet
-        pitch.current = Math.max(-0.25, Math.min(1.2, pitch.current));
-
-        onCameraYawChange?.(yaw.current);
+        moved = true;
       } else if (isMouseDown.current) {
         // Drag without pointer lock fallback
         const deltaX = e.clientX - previousMousePosition.current.x;
@@ -99,9 +97,26 @@ export function ThirdPersonCamera({
 
         yaw.current -= deltaX * sensitivity;
         pitch.current -= deltaY * sensitivity;
+        moved = true;
+      }
+
+      if (moved) {
+        // Clamp pitch so camera cannot flip upside down or clip under feet
         pitch.current = Math.max(-0.25, Math.min(1.2, pitch.current));
 
-        onCameraYawChange?.(yaw.current);
+        // High-frequency vanilla DOM broadcast (bypasses React reconciliation lag)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('sovereign-camera-yaw', { detail: yaw.current })
+          );
+        }
+
+        // Throttle React state callbacks to at most once per 120ms
+        const now = performance.now();
+        if (now - lastYawEmitTime.current > 120) {
+          lastYawEmitTime.current = now;
+          onCameraYawChange?.(yaw.current);
+        }
       }
     };
 
@@ -158,33 +173,15 @@ export function ThirdPersonCamera({
 
     let finalCamPos = focusPoint.clone().add(idealOffset);
 
-    // Camera Collision Avoidance (Raycast from focusPoint to idealCamPos)
-    const rayDir = finalCamPos.clone().sub(focusPoint).normalize();
-    const maxRayDist = finalCamPos.distanceTo(focusPoint);
-
-    raycaster.current.set(focusPoint, rayDir);
-    raycaster.current.far = maxRayDist;
-
-    // Check intersecting objects in scene (excluding player and helper beacons)
-    const intersects = raycaster.current.intersectObjects(scene.children, true);
-    for (const hit of intersects) {
-      if (
-        hit.distance < maxRayDist &&
-        hit.object.type === 'Mesh' &&
-        !hit.object.name.includes('Character') &&
-        !hit.object.name.includes('Hero') &&
-        !hit.object.name.includes('Beacon')
-      ) {
-        // Pull camera closer to prevent clipping through walls
-        const safeDist = Math.max(minDistance, hit.distance - 0.25);
-        finalCamPos = focusPoint.clone().add(rayDir.multiplyScalar(safeDist));
-        break;
-      }
+    // Zero-overhead O(1) procedural terrain height clearance check
+    const terrainHeight = getTerrainHeight(finalCamPos.x, finalCamPos.z);
+    if (finalCamPos.y < terrainHeight + 0.65) {
+      finalCamPos.y = terrainHeight + 0.65;
     }
 
     // Smooth Lerp Camera Lag
-    currentCamPos.current.lerp(finalCamPos, delta * 12);
-    currentLookAt.current.lerp(focusPoint, delta * 15);
+    currentCamPos.current.lerp(finalCamPos, delta * 14);
+    currentLookAt.current.lerp(focusPoint, delta * 16);
 
     camera.position.copy(currentCamPos.current);
     camera.lookAt(currentLookAt.current);

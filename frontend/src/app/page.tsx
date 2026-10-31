@@ -16,6 +16,7 @@ import { CitadelCouncilModal } from '@/components/web3-hud/CitadelCouncilModal';
 import { GameSettingsModal } from '@/components/settings/GameSettingsModal';
 import { PauseEscapeMenu } from '@/components/settings/PauseEscapeMenu';
 import { TacticalOverlayHUD } from '@/components/tactical-map/TacticalOverlayHUD';
+import { BuildingMenuHUD } from '@/components/world/BuildingMenuHUD';
 import { TransactionToast, TxStatus } from '@/components/web3-hud/TransactionToast';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
@@ -23,6 +24,8 @@ import { useParcelContract } from '@/hooks/web3/useParcelContract';
 import { useKingdomTreasury } from '@/hooks/web3/useKingdomTreasury';
 import { getParcelAtPosition, ParcelEntity } from '@/lib/world/parcelCoordinates';
 import { StructureTypeEnum } from '@/lib/assets/modelRegistry';
+import { STRUCTURE_BUILD_INFO } from '@/hooks/useBuildingPlacement';
+import { npcManager } from '../../../ai-system/npc-engine/NPCManager';
 import { soundManager } from '@/lib/audio/SoundManager';
 
 /**
@@ -105,11 +108,20 @@ function GameWorldContent() {
     return Math.hypot(dx, dz) < 4.5;
   }, [playerPosition]);
 
+  // Check proximity to nearby living NPCs
+  const nearestNpc = useMemo(() => {
+    return npcManager.getNearestNPC();
+  }, [playerPosition]);
+
   // Determine current contextual prompt action
   const promptAction = useMemo<PromptActionType | null>(() => {
     // If dialogue or modal is open, suppress world prompts
     if (isAnyModalOpen) {
       return null;
+    }
+
+    if (nearestNpc) {
+      return 'npc';
     }
 
     if (isNearWarTable) {
@@ -205,8 +217,42 @@ function GameWorldContent() {
     }
   }, [currentParcel, claimGold]);
 
+  const handleConfirmBuild = useCallback(async () => {
+    if (!currentParcel) return;
+    const info = STRUCTURE_BUILD_INFO[buildStructureType];
+    const structureName = info?.name || 'Structure';
+    setTxToast({
+      status: 'mining',
+      txHash: null,
+      title: `Constructing ${structureName}`,
+      description: `Broadcasting construction of Plot #${currentParcel.id} to blockchain...`,
+    });
+    try {
+      const hash = await constructStructure(currentParcel.id, buildStructureType);
+      setTxToast({
+        status: 'confirmed',
+        txHash: hash || '0x5c9f...Amoy',
+        title: `${structureName} Completed!`,
+        description: `Successfully erected on Plot #${currentParcel.id}.`,
+      });
+      setIsBuildingMode(false);
+    } catch (err: any) {
+      setTxToast({
+        status: 'failed',
+        txHash: null,
+        title: 'Construction Failed',
+        description: err?.message || 'Transaction rejected or insufficient funds.',
+      });
+    }
+  }, [currentParcel, buildStructureType, constructStructure]);
+
   const handleTriggerAction = useCallback(() => {
     switch (promptAction) {
+      case 'npc':
+        if (nearestNpc) {
+          setActiveNpc(nearestNpc.id);
+        }
+        break;
       case 'buy':
         handleClaimOrBuy();
         break;
@@ -220,7 +266,7 @@ function GameWorldContent() {
         setIsBuildingMode((prev) => !prev);
         break;
     }
-  }, [promptAction, handleClaimOrBuy, handleHarvestGold]);
+  }, [promptAction, nearestNpc, handleClaimOrBuy, handleHarvestGold]);
 
   // Respawn Handler
   const handleRespawn = useCallback(() => {
@@ -286,10 +332,17 @@ function GameWorldContent() {
           handleClaimOrBuy();
         }
       } else if (e.key === 'e' || e.key === 'E') {
+        const nearestNpc = npcManager.getNearestNPCId();
+        if (nearestNpc && !activeNpc) {
+          setActiveNpc(nearestNpc);
+          return;
+        }
         if (promptAction === 'harvest') {
           handleHarvestGold();
         } else if (isNearWarTable) {
           setIsTacticalOpen(true);
+        } else if (promptAction === 'build') {
+          setIsBuildingMode((prev) => !prev);
         }
       } else if (e.key === 'c' || e.key === 'C') {
         setIsBuildingMode((prev) => !prev);
@@ -321,7 +374,7 @@ function GameWorldContent() {
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-black select-none">
       {/* 3D Canvas Viewport */}
-      <GameCanvas showLighting={false}>
+      <GameCanvas showLighting={false} graphicsQuality={graphicsQuality}>
         <MainScene
           parcels={allParcels}
           connectedPlayerAddress={address}
@@ -337,6 +390,7 @@ function GameWorldContent() {
           showLighting={true}
           showPostProcessing={false} // Canvas already has outer vignette
           isPointerLockDisabled={isAnyModalOpen}
+          graphicsQuality={graphicsQuality}
         />
       </GameCanvas>
 
@@ -391,6 +445,8 @@ function GameWorldContent() {
       <InteractionPrompt
         actionType={promptAction}
         parcelId={currentParcel?.id}
+        npcName={nearestNpc?.name}
+        npcRole={nearestNpc?.role}
         goldReward={25}
         priceEth="0.01"
         onTrigger={handleTriggerAction}
@@ -401,11 +457,42 @@ function GameWorldContent() {
         isOpen={Boolean(activeNpc)}
         npcId={activeNpc}
         onClose={() => setActiveNpc(null)}
+        onOpenSettings={() => {
+          setSettingsInitialTab('ai');
+          setIsSettingsOpen(true);
+        }}
         worldContext={{
           currentKingdom: currentParcel?.kingdom || 'North',
           playerGold,
           timeOfDay: gameState.timeOfDay,
         }}
+      />
+
+      {/* Royal Architect & Construction Registry HUD ([C]) */}
+      <BuildingMenuHUD
+        isOpen={isBuildingMode}
+        selectedStructure={buildStructureType}
+        playerGold={playerGold}
+        onSelectStructure={setBuildStructureType}
+        onConfirmBuild={handleConfirmBuild}
+        onClose={() => setIsBuildingMode(false)}
+        canBuildHere={
+          Boolean(currentParcel) &&
+          Boolean(address) &&
+          Boolean(currentParcel?.owner) &&
+          currentParcel?.owner?.toLowerCase() === address?.toLowerCase()
+        }
+        validationReason={
+          !currentParcel
+            ? 'Must be standing within an owned parcel to construct'
+            : !address
+            ? 'Connect wallet or claim parcel in demo mode'
+            : currentParcel.owner?.toLowerCase() !== address?.toLowerCase()
+            ? 'You do not own this territory'
+            : playerGold < (STRUCTURE_BUILD_INFO[buildStructureType]?.goldCost || 50)
+            ? `Insufficient gold (Need ${STRUCTURE_BUILD_INFO[buildStructureType]?.goldCost}g, have ${playerGold}g)`
+            : null
+        }
       />
 
       {/* Citadel Council Governance Modal ([V]) */}
