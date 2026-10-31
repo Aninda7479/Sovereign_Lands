@@ -14,6 +14,7 @@ import { InteractionPrompt, PromptActionType } from '@/components/web3-hud/Inter
 import { DialogueHUD } from '@/components/npc-dialogue/DialogueHUD';
 import { CitadelCouncilModal } from '@/components/web3-hud/CitadelCouncilModal';
 import { AISettingsModal } from '@/components/ai-connection/AISettingsModal';
+import { GameSettingsModal } from '@/components/settings/GameSettingsModal';
 import { AIStatusBadge } from '@/components/ai-connection/AIStatusBadge';
 import { TacticalOverlayHUD } from '@/components/tactical-map/TacticalOverlayHUD';
 import { TransactionToast, TxStatus } from '@/components/web3-hud/TransactionToast';
@@ -52,9 +53,12 @@ function GameWorldContent() {
   // Modals & Dialogue UI state
   const [isCouncilOpen, setIsCouncilOpen] = useState(false);
   const [isTacticalOpen, setIsTacticalOpen] = useState(false);
-  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeNpc, setActiveNpc] = useState<string | null>(null);
   const [isBuildingMode, setIsBuildingMode] = useState(false);
+  const [showRadar, setShowRadar] = useState(true);
+  const [showCompass, setShowCompass] = useState(true);
+  const [showPostProcessing, setShowPostProcessing] = useState(true);
   const [buildStructureType, setBuildStructureType] = useState<StructureTypeEnum>(
     StructureTypeEnum.Farmstead
   );
@@ -85,7 +89,7 @@ function GameWorldContent() {
   // Determine current contextual prompt action
   const promptAction = useMemo<PromptActionType | null>(() => {
     // If dialogue or modal is open, suppress world prompts
-    if (activeNpc || isCouncilOpen || isTacticalOpen || isAISettingsOpen) {
+    if (activeNpc || isCouncilOpen || isTacticalOpen || isSettingsOpen) {
       return null;
     }
 
@@ -125,7 +129,7 @@ function GameWorldContent() {
     activeNpc,
     isCouncilOpen,
     isTacticalOpen,
-    isAISettingsOpen,
+    isSettingsOpen,
     isNearWarTable,
     currentParcel,
     address,
@@ -214,12 +218,17 @@ function GameWorldContent() {
       }
 
       if (e.key === 'Escape') {
-        setIsCouncilOpen(false);
-        setIsTacticalOpen(false);
-        setIsAISettingsOpen(false);
-        setActiveNpc(null);
-        setIsBuildingMode(false);
-        return;
+        if (isSettingsOpen || isCouncilOpen || isTacticalOpen || activeNpc || isBuildingMode) {
+          setIsCouncilOpen(false);
+          setIsTacticalOpen(false);
+          setIsSettingsOpen(false);
+          setActiveNpc(null);
+          setIsBuildingMode(false);
+          return;
+        } else {
+          setIsSettingsOpen(true);
+          return;
+        }
       }
 
       if (e.key === 'b' || e.key === 'B') {
@@ -238,8 +247,8 @@ function GameWorldContent() {
         setIsCouncilOpen((prev) => !prev);
       } else if (e.key === 'm' || e.key === 'M') {
         setIsTacticalOpen((prev) => !prev);
-      } else if (e.key === 'k' || e.key === 'K') {
-        setIsAISettingsOpen((prev) => !prev);
+      } else if (e.key === 'k' || e.key === 'K' || e.key === 'Escape') {
+        setIsSettingsOpen((prev) => !prev);
       }
     };
 
@@ -269,56 +278,43 @@ function GameWorldContent() {
       </GameCanvas>
 
       {/* 2D HUD Overlays */}
-      {/* Top Resource HUD & Wallet Connect */}
+      {/* Top Resource HUD, Wallet & Settings Control */}
       <TopResourceHUD
         onOpenCouncil={() => setIsCouncilOpen(true)}
         onOpenBuildMenu={() => setIsBuildingMode((prev) => !prev)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      {/* Top Compass Heading Tape */}
-      <Suspense fallback={null}>
-        <CompassHeading
-          cameraYaw={cameraYaw}
-          playerPosition={playerPosition}
-          activeWaypoint={activeWaypoint}
-        />
-      </Suspense>
+      {/* Top Compass Heading Tape (Toggleable in Settings) */}
+      {showCompass && (
+        <Suspense fallback={null}>
+          <CompassHeading
+            cameraYaw={cameraYaw}
+            playerPosition={playerPosition}
+            activeWaypoint={activeWaypoint}
+          />
+        </Suspense>
+      )}
 
-      {/* GTA-style Mission Tracker in Top-Left */}
-      <Suspense
-        fallback={
-          <div className="absolute top-20 left-6 z-20">
-            <UnderConstruction moduleName="Quest Tracker" agentId="agent-12" compact />
-          </div>
-        }
-      >
+      {/* GTA-style Mission Tracker (Clean, default collapsed in top-left) */}
+      <Suspense fallback={null}>
         <QuestObjectiveHUD
           onWaypointChange={setActiveWaypoint}
+          defaultCollapsed={true}
         />
       </Suspense>
 
-      {/* Circular Radar Mini-Map in Bottom-Left */}
-      <Suspense
-        fallback={
-          <div className="absolute bottom-6 left-6 z-30">
-            <UnderConstruction moduleName="Radar Mini-Map" agentId="agent-12" compact />
-          </div>
-        }
-      >
-        <RadarMiniMap
-          playerPosition={playerPosition}
-          cameraYaw={cameraYaw}
-          activeWaypoint={activeWaypoint}
-          onSelectWaypoint={setActiveWaypoint}
-        />
-      </Suspense>
-
-      {/* AI Connection Status Pill (Bottom-Right / Top-Right) */}
-      <div className="fixed top-20 right-6 z-30 pointer-events-auto">
-        <AIStatusBadge
-          onOpenSettings={() => setIsAISettingsOpen(true)}
-        />
-      </div>
+      {/* Circular Radar Mini-Map in Bottom-Left (Toggleable in Settings) */}
+      {showRadar && (
+        <Suspense fallback={null}>
+          <RadarMiniMap
+            playerPosition={playerPosition}
+            cameraYaw={cameraYaw}
+            activeWaypoint={activeWaypoint}
+            onSelectWaypoint={setActiveWaypoint}
+          />
+        </Suspense>
+      )}
 
       {/* GTA Contextual Interaction Prompt (Bottom-Center) */}
       <InteractionPrompt
@@ -355,10 +351,18 @@ function GameWorldContent() {
         playerKingdom={currentParcel?.kingdom === 'South' ? 'South' : 'North'}
       />
 
-      {/* BYOAI Hub & LLM Key Vault Modal ([K]) */}
-      <AISettingsModal
-        isOpen={isAISettingsOpen}
-        onClose={() => setIsAISettingsOpen(false)}
+      {/* Master Settings Hub (AI Key Vault, Controls, Realm, Graphics) */}
+      <GameSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        hudSettings={{
+          showRadar,
+          setShowRadar,
+          showCompass,
+          setShowCompass,
+          showPostProcessing,
+          setShowPostProcessing,
+        }}
       />
 
       {/* Web3 Mining & Confirmation Toast */}
