@@ -172,6 +172,8 @@ export function OpenWorldTerrain({
     }
     grassGeo.setIndex(new THREE.BufferAttribute(combinedIndices, 1));
     grassGeo.computeVertexNormals();
+    grassGeo.computeBoundingSphere();
+    grassGeo.computeBoundingBox();
 
     const grassMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
@@ -181,7 +183,7 @@ export function OpenWorldTerrain({
       flatShading: true,
     });
 
-    const GRASS_COUNT = 1800;
+    const GRASS_COUNT = 1200;
     const mesh = new THREE.InstancedMesh(grassGeo, grassMat, GRASS_COUNT);
 
     let seed = 777;

@@ -60,8 +60,8 @@ export function GameCanvas({
         camera={{
           position: cameraPosition,
           fov: cameraFov,
-          near: 0.1,
-          far: 4500,
+          near: 0.3,
+          far: 2500,
         }}
         style={{
           width: '100%',

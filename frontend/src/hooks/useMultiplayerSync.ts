@@ -179,38 +179,36 @@ export function useMultiplayerSync(
               }>;
 
               const now = Date.now();
-              const updated = { ...remotePlayersRef.current };
+              const currentPlayers = remotePlayersRef.current;
               const receivedIds = new Set<string>();
+              let listChanged = false;
 
               for (const sp of serverPlayers) {
                 // Skip local player
                 if (sp.id === myPlayerId) continue;
                 receivedIds.add(sp.id);
 
-                const existing = updated[sp.id];
+                const existing = currentPlayers[sp.id];
                 if (existing) {
-                  // Dead reckoning velocity calculation
+                  // In-place mutate target coordinates for silky 60 FPS interpolation without React re-renders
                   const dt = Math.max((now - existing.lastUpdate) / 1000, 0.01);
                   const vx = (sp.x - existing.targetX) / dt;
                   const vz = (sp.z - existing.targetZ) / dt;
 
-                  updated[sp.id] = {
-                    ...existing,
-                    walletAddress: sp.walletAddress,
-                    nickname: sp.nickname,
-                    kingdom: sp.kingdom,
-                    animState: sp.animState,
-                    targetX: sp.x,
-                    targetY: sp.y,
-                    targetZ: sp.z,
-                    targetRotationY: sp.rotationY,
-                    velocityX: isFinite(vx) ? vx : 0,
-                    velocityZ: isFinite(vz) ? vz : 0,
-                    lastUpdate: now,
-                  };
+                  existing.walletAddress = sp.walletAddress;
+                  existing.nickname = sp.nickname;
+                  existing.kingdom = sp.kingdom;
+                  existing.animState = sp.animState;
+                  existing.targetX = sp.x;
+                  existing.targetY = sp.y;
+                  existing.targetZ = sp.z;
+                  existing.targetRotationY = sp.rotationY;
+                  existing.velocityX = isFinite(vx) ? vx : 0;
+                  existing.velocityZ = isFinite(vz) ? vz : 0;
+                  existing.lastUpdate = now;
                 } else {
                   // New remote player detected
-                  updated[sp.id] = {
+                  currentPlayers[sp.id] = {
                     id: sp.id,
                     walletAddress: sp.walletAddress,
                     nickname: sp.nickname,
@@ -228,17 +226,22 @@ export function useMultiplayerSync(
                     velocityZ: 0,
                     lastUpdate: now,
                   };
+                  listChanged = true;
                 }
               }
 
               // Prune players no longer in interest set
-              for (const id of Object.keys(updated)) {
+              for (const id of Object.keys(currentPlayers)) {
                 if (!receivedIds.has(id)) {
-                  delete updated[id];
+                  delete currentPlayers[id];
+                  listChanged = true;
                 }
               }
 
-              setRemotePlayers(updated);
+              // Only trigger React re-render when a player actually connects or disconnects
+              if (listChanged) {
+                setRemotePlayers({ ...currentPlayers });
+              }
               break;
             }
 
