@@ -1,0 +1,126 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "SovereignLands-GLTF-Builder"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Character",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Character_node",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Character_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Character_mat",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.23137254901960785,
+          0.5098039215686274,
+          0.9647058823529412,
+          1
+        ],
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.8
+      }
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "max": [
+        0.4,
+        0.9,
+        0.3
+      ],
+      "min": [
+        -0.4,
+        -0.9,
+        -0.3
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR",
+      "max": [
+        23
+      ],
+      "min": [
+        0
+      ]
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 72,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 648,
+      "uri": "data:application/octet-stream;base64,zczMvmZmZr+amZk+zczMPmZmZr+amZk+zczMPmZmZj+amZk+zczMvmZmZj+amZk+zczMvmZmZr+amZm+zczMvmZmZj+amZm+zczMPmZmZj+amZm+zczMPmZmZr+amZm+zczMvmZmZj+amZm+zczMvmZmZj+amZk+zczMPmZmZj+amZk+zczMPmZmZj+amZm+zczMvmZmZr+amZm+zczMPmZmZr+amZm+zczMPmZmZr+amZk+zczMvmZmZr+amZk+zczMPmZmZr+amZm+zczMPmZmZj+amZm+zczMPmZmZj+amZk+zczMPmZmZr+amZk+zczMvmZmZr+amZm+zczMvmZmZr+amZk+zczMvmZmZj+amZk+zczMvmZmZj+amZm+AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcA"
+    }
+  ]
+}
