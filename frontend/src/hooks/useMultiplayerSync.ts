@@ -80,6 +80,20 @@ const POSITION_SEND_INTERVAL_MS = 50; // 20Hz broadcast
 const SPEECH_BUBBLE_LIFETIME_MS = 6000; // 6 seconds speech bubble duration
 
 /**
+ * Resolves the appropriate WebSocket URL based on runtime environment.
+ */
+function resolveWebSocketUrl(explicitUrl?: string): string {
+  if (explicitUrl) return explicitUrl;
+  if (process.env.NEXT_PUBLIC_WS_URL) return process.env.NEXT_PUBLIC_WS_URL;
+  if (typeof window !== 'undefined') {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.hostname || 'localhost';
+    return `${protocol}//${host}:4000`;
+  }
+  return DEFAULT_WS_URL;
+}
+
+/**
  * useMultiplayerSync
  * Real-time WebSocket hook connecting to Sovereign Lands 3D Multiplayer Server.
  * Supports 20Hz dead-reckoning position sync, proximity chat, and graceful offline fallback.
@@ -88,11 +102,7 @@ export function useMultiplayerSync(
   options: UseMultiplayerSyncOptions = {}
 ): UseMultiplayerSyncReturn {
   const {
-    serverUrl = DEFAULT_WS_URL,
-    walletAddress = '0x0000000000000000000000000000000000000000',
-    nickname = 'Wanderer',
-    kingdom = 'none',
-    initialPosition = [0, 2.0, 0],
+    serverUrl,
     enabled = true,
   } = options;
 
@@ -116,39 +126,70 @@ export function useMultiplayerSync(
     anim: 'idle',
   });
 
+  // Keep latest options in ref to avoid socket reconnect churn on every render
+  const optionsRef = useRef(options);
+  useEffect(() => {
+    optionsRef.current = options;
+  });
+
+  const myPlayerIdRef = useRef<string | null>(null);
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Reference to current remote players for instant packet processing without stale closures
   const remotePlayersRef = useRef<Record<string, NetworkedRemotePlayer>>({});
   useEffect(() => {
     remotePlayersRef.current = remotePlayers;
   }, [remotePlayers]);
 
-  // Connect / Reconnect handler
+  // Connect / Reconnect handler - stable reference, reads mutable options from optionsRef
   const connectSocket = useCallback(() => {
-    if (!enabled) return;
+    if (!isMountedRef.current) return;
+    if (optionsRef.current.enabled === false) return;
 
-    if (socketRef.current && (socketRef.current.readyState === WebSocket.OPEN || socketRef.current.readyState === WebSocket.CONNECTING)) {
+    if (
+      socketRef.current &&
+      (socketRef.current.readyState === WebSocket.OPEN ||
+        socketRef.current.readyState === WebSocket.CONNECTING)
+    ) {
       return;
     }
 
     try {
       setConnectionStatus(reconnectAttemptsRef.current === 0 ? 'connecting' : 'reconnecting');
-      const ws = new WebSocket(serverUrl);
+      const wsUrl = resolveWebSocketUrl(optionsRef.current.serverUrl);
+      const ws = new WebSocket(wsUrl);
       socketRef.current = ws;
 
       ws.onopen = () => {
+        if (!isMountedRef.current) {
+          try {
+            ws.close();
+          } catch {
+            // Safe ignore
+          }
+          return;
+        }
         reconnectAttemptsRef.current = 0;
         setConnected(true);
         setConnectionStatus('connected');
 
         // Send initial join packet with player profile
+        const opts = optionsRef.current;
+        const initPos = opts.initialPosition || [0, 2.0, 0];
         const joinPacket = {
           type: 'join',
-          walletAddress,
-          nickname,
-          kingdom,
-          x: initialPosition[0],
-          y: initialPosition[1],
-          z: initialPosition[2],
+          walletAddress: opts.walletAddress || '0x0000000000000000000000000000000000000000',
+          nickname: opts.nickname || 'Wanderer',
+          kingdom: opts.kingdom || 'none',
+          x: initPos[0],
+          y: initPos[1],
+          z: initPos[2],
           rotationY: 0,
         };
         ws.send(JSON.stringify(joinPacket));
@@ -160,6 +201,7 @@ export function useMultiplayerSync(
 
           switch (data.type) {
             case 'welcome': {
+              myPlayerIdRef.current = data.playerId;
               setMyPlayerId(data.playerId);
               break;
             }
@@ -182,10 +224,11 @@ export function useMultiplayerSync(
               const currentPlayers = remotePlayersRef.current;
               const receivedIds = new Set<string>();
               let listChanged = false;
+              const currentMyId = myPlayerIdRef.current;
 
               for (const sp of serverPlayers) {
                 // Skip local player
-                if (sp.id === myPlayerId) continue;
+                if (sp.id === currentMyId) continue;
                 receivedIds.add(sp.id);
 
                 const existing = currentPlayers[sp.id];
@@ -230,7 +273,7 @@ export function useMultiplayerSync(
                 }
               }
 
-              // Prune players no longer in interest set
+              // Remove disconnected players
               for (const id of Object.keys(currentPlayers)) {
                 if (!receivedIds.has(id)) {
                   delete currentPlayers[id];
@@ -247,7 +290,7 @@ export function useMultiplayerSync(
 
             case 'player_joined': {
               const p = data.player;
-              if (p && p.id !== myPlayerId) {
+              if (p && p.id !== myPlayerIdRef.current) {
                 setRemotePlayers((prev) => ({
                   ...prev,
                   [p.id]: {
@@ -325,7 +368,7 @@ export function useMultiplayerSync(
               break;
             }
           }
-        } catch (err) {
+        } catch {
           // Graceful ignore
         }
       };
@@ -335,8 +378,8 @@ export function useMultiplayerSync(
         setConnectionStatus('disconnected');
         socketRef.current = null;
 
-        // Offline fallback & safe auto-reconnection with exponential backoff
-        if (enabled) {
+        // Offline fallback & safe auto-reconnection with exponential backoff if still mounted
+        if (isMountedRef.current && (optionsRef.current.enabled ?? true)) {
           reconnectAttemptsRef.current += 1;
           const delay = Math.min(2000 * Math.pow(1.5, reconnectAttemptsRef.current - 1), 20000);
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -349,27 +392,47 @@ export function useMultiplayerSync(
         // Suppress browser console throw - enables silent single-player fallback
         setConnected(false);
       };
-    } catch (err) {
+    } catch {
       // Graceful offline fallback
       setConnected(false);
       setConnectionStatus('disconnected');
     }
-  }, [enabled, serverUrl, walletAddress, nickname, kingdom, initialPosition, myPlayerId]);
+  }, []);
 
-  // Initial connection mount & teardown
+  // Initial connection mount & teardown - only restarts if enabled or serverUrl explicitly changes
   useEffect(() => {
+    if (enabled === false) return;
+
     connectSocket();
 
     return () => {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
       }
-      if (socketRef.current) {
-        socketRef.current.close();
+      const ws = socketRef.current;
+      if (ws) {
         socketRef.current = null;
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            ws.close();
+          } catch {
+            // Safe ignore
+          }
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+          // Prevent browser error: "WebSocket is closed before the connection is established"
+          ws.onopen = () => {
+            try {
+              ws.close();
+            } catch {
+              // Safe ignore
+            }
+          };
+          ws.onerror = () => {};
+        }
       }
     };
-  }, [connectSocket]);
+  }, [enabled, serverUrl, connectSocket]);
 
   // Periodic Speech Bubble Cleanup
   useEffect(() => {
@@ -478,8 +541,29 @@ export function useMultiplayerSync(
 
   // Manual reconnect trigger
   const reconnect = useCallback(() => {
-    if (socketRef.current) {
-      socketRef.current.close();
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    const ws = socketRef.current;
+    if (ws) {
+      socketRef.current = null;
+      if (ws.readyState === WebSocket.OPEN) {
+        try {
+          ws.close();
+        } catch {
+          // Safe ignore
+        }
+      } else if (ws.readyState === WebSocket.CONNECTING) {
+        ws.onopen = () => {
+          try {
+            ws.close();
+          } catch {
+            // Safe ignore
+          }
+        };
+        ws.onerror = () => {};
+      }
     }
     reconnectAttemptsRef.current = 0;
     connectSocket();

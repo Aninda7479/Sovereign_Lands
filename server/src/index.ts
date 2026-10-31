@@ -77,7 +77,7 @@ wss.on('connection', (ws) => {
 worldRoom.start();
 
 // Start HTTP + WebSocket Server
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ==============================================================
 ⚔️  SOVEREIGN LANDS MULTIPLAYER SERVER (AGENT-17)

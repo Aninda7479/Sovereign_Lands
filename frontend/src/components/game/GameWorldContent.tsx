@@ -32,6 +32,8 @@ import { STRUCTURE_BUILD_INFO } from '@/hooks/useBuildingPlacement';
 import { npcManager } from '../../../../ai-system/npc-engine/NPCManager';
 import { soundManager } from '@/lib/audio/SoundManager';
 
+const DEFAULT_SPAWN_POS: [number, number, number] = [0, 2.0, 0];
+
 /**
  * Inner Game Content connecting 3D Canvas, Web3 contracts, and GTA-style HUD overlays.
  */
@@ -148,7 +150,7 @@ export function GameWorldContent() {
   } = useMultiplayerSync({
     walletAddress: address || '0x0000000000000000000000000000000000000000',
     kingdom: (currentParcel?.kingdom?.toLowerCase() as any) || 'north',
-    initialPosition: [0, 2.0, 0],
+    initialPosition: DEFAULT_SPAWN_POS,
     enabled: true,
   });
 
