@@ -16,6 +16,8 @@ const nextConfig = {
       '@x402/core/client': false,
       '@x402/svm/exact/client': false,
       '@x402/evm': false,
+      '@react-native-async-storage/async-storage': false,
+      'pino-pretty': false,
       fs: false,
       net: false,
       tls: false,
@@ -27,6 +29,8 @@ const nextConfig = {
       '@x402/core/client': false,
       '@x402/svm/exact/client': false,
       '@x402/evm': false,
+      '@react-native-async-storage/async-storage': false,
+      'pino-pretty': false,
     };
     config.module.rules.push({
       test: /\.(glsl|vs|fs|vert|frag)$/,

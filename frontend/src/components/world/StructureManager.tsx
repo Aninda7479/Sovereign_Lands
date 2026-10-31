@@ -41,9 +41,12 @@ export function StructureManager({
         const model = modelManager.getStructureByEnum(p.structure, faction) || new THREE.Group();
         const cloned = model.clone();
 
-        // Track windmill rotors for rotation animation
-        if (p.structure === StructureTypeEnum.Farmstead && cloned.userData?.windmillRotor) {
-          windmillRotors.current.push(cloned.userData.windmillRotor);
+        // Track windmill rotors for rotation animation using cloned object hierarchy
+        if (p.structure === StructureTypeEnum.Farmstead) {
+          const rotor = cloned.getObjectByName('WindmillRotor') as THREE.Group | null;
+          if (rotor) {
+            windmillRotors.current.push(rotor);
+          }
         }
 
         const info = STRUCTURE_BUILD_INFO[p.structure] || {
@@ -65,7 +68,8 @@ export function StructureManager({
   // View-distance LOD filtering relative to player
   const visibleStructures = useMemo(() => {
     if (!playerPosition) return activeStructures;
-    const [px, , pz] = playerPosition;
+    const px = Array.isArray(playerPosition) ? playerPosition[0] : (playerPosition as any).x;
+    const pz = Array.isArray(playerPosition) ? playerPosition[2] : (playerPosition as any).z;
 
     return activeStructures.filter((s) => {
       const [sx, , sz] = s.position;
@@ -77,7 +81,9 @@ export function StructureManager({
   // Animate windmill rotors
   useFrame((_, delta) => {
     for (const rotor of windmillRotors.current) {
-      rotor.rotation.z += delta * 1.5;
+      if (rotor && rotor.rotation) {
+        rotor.rotation.z += delta * 1.5;
+      }
     }
   });
 
