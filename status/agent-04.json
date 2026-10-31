@@ -1,5 +1,20 @@
 {
   "agentId": "agent-04",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.311Z"
+  "name": "Website Shell & 3D Canvas",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T06:47:00Z",
+  "progress": "Scaffolding Next.js 14, React Three Fiber Canvas, and UI shell...",
+  "exclusiveFiles": [
+    "frontend/package.json",
+    "frontend/tsconfig.json",
+    "frontend/next.config.js",
+    "frontend/tailwind.config.ts",
+    "frontend/src/app/globals.css",
+    "frontend/src/app/layout.tsx",
+    "frontend/src/components/canvas/GameCanvas.tsx",
+    "frontend/src/components/canvas/SceneLighting.tsx",
+    "frontend/src/components/canvas/PostProcessing.tsx",
+    "frontend/src/components/ui/LoadingScreen.tsx",
+    "frontend/src/components/ui/UnderConstruction.tsx"
+  ]
 }
