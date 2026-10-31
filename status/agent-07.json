@@ -1,5 +1,17 @@
 {
   "agentId": "agent-07",
-  "status": "WAITING_TO_START",
-  "updatedAt": "2026-10-31T06:04:05.312Z"
+  "name": "3D Web3 Interaction & In-World HUD",
+  "status": "UNDER_CONSTRUCTION",
+  "startedAt": "2026-10-31T07:03:00Z",
+  "progress": "Building in-world 3D interaction triggers, wagmi v2 hooks, and transaction HUD...",
+  "exclusiveFiles": [
+    "frontend/src/lib/web3/wagmiConfig.ts",
+    "frontend/src/lib/web3/contractAddresses.ts",
+    "frontend/src/hooks/web3/useParcelContract.ts",
+    "frontend/src/hooks/web3/useKingdomTreasury.ts",
+    "frontend/src/components/web3-hud/InteractionPrompt.tsx",
+    "frontend/src/components/web3-hud/TopResourceHUD.tsx",
+    "frontend/src/components/web3-hud/TransactionToast.tsx",
+    "frontend/src/components/web3-hud/CitadelCouncilModal.tsx"
+  ]
 }
